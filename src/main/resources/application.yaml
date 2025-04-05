@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: HomeService
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/homeServices
+    username: postgres
+    password: mostafa11684
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      properties:
+        hibernate:
+          show_sql: true
+
+          server:
+            port: 8080
