@@ -8,14 +8,18 @@ import com.example.maktabsharif.homeservices.enumeration.OrderStatus;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
 import com.example.maktabsharif.homeservices.exception.InvalidInputException;
 import com.example.maktabsharif.homeservices.exception.NotFoundException;
+import com.example.maktabsharif.homeservices.repository.OrderRequestRepository;
 import com.example.maktabsharif.homeservices.repository.OrdersRepository;
 import com.example.maktabsharif.homeservices.service.CustomerService;
 import com.example.maktabsharif.homeservices.service.OrderService;
 import com.example.maktabsharif.homeservices.service.ServiceManagementService;
+import com.example.maktabsharif.homeservices.service.SpecialistService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -26,10 +30,12 @@ public class OrderServiceImpl implements OrderService {
     private final OrdersRepository ordersRepository;
     private final ServiceManagementService serviceManagement;
     private final CustomerService customerService;
+    private final OrderRequestRepository orderRequestService;
+    private final SpecialistService specialistService;
     @Override
     public OrderDTO addNewOrder(OrderCreateDTO createDTO) {
-        var service = serviceManagement.findSubServiceByName(createDTO.subService().getName());
-        var customerOrderRequest=  customerService.chooseLoginCustomerById(createDTO.customerRequestService().getId());
+        var service = serviceManagement.findSubServiceByName(createDTO.subService());
+       var customerLogg = customerService.chooseLoginCustomerById(createDTO.customerRequestService());
         Orders order = new Orders();
 
 
@@ -39,8 +45,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderPriceRequest(createDTO.orderPriceRequest());
         order.setOrderStatus(OrderStatus.PENDING_OFFERS);
-        order.setCustomerRequestService(customerOrderRequest);
-        order.setSubService(createDTO.subService());
+        order.setCustomerRequestService(customerLogg);
+        order.setSubService(service);
 
         var orderSaved= ordersRepository.save(order);
 
@@ -72,6 +78,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Optional<Orders> findById(Long id) {
+        if (ordersRepository.findById(id).isEmpty())
+            throw new NotFoundException("order with id{"+
+                    id+"} not found!"
+                    ,CustomApiExceptionType.NOT_FOUND);
+
+        return ordersRepository.findById(id);
+    }
+
+    @Override
     public OrderDTO findOrderById(Long id) {
         if (ordersRepository.findById(id).isEmpty())
             throw new NotFoundException("order with id{"+
@@ -93,6 +109,9 @@ public class OrderServiceImpl implements OrderService {
         ordersRepository.deleteById(id);
 
     }
+
+
+
     private OrderDTO getDtoFromOrder(Orders order) {
         return OrderDTO.builder()
                 .id(order.getId())
