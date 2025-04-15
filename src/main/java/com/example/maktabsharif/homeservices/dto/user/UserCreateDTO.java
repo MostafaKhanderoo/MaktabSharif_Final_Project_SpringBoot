@@ -4,7 +4,6 @@ import com.example.maktabsharif.homeservices.enumeration.Role;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import lombok.Builder;
 
-import java.io.File;
 import java.time.LocalDateTime;
 
 
