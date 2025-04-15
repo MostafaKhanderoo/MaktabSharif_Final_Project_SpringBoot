@@ -17,3 +17,9 @@ spring:
 
           server:
             port: 8080
+
+
+            file:
+              valid-extensions: jpg,png,jpeg,pdf,xlsx,xls,doc,docx
+              download:
+                block-size: 8080
