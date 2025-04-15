@@ -27,5 +27,7 @@ public class Orders extends BaseEntity<Long> {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+    @ManyToOne
+    private User specialistAccepted;
 
 }
