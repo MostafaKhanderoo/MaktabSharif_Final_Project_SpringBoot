@@ -10,6 +10,7 @@ public interface SpecialistService {
     UserDTO updateSpecialist(UserUpdateDTO updateDTO);
     UserDTO findById(Long id);
     void deleteById(Long id);
+    User findByIdUser(Long id);
 
     User findSpecialistByFirstName(String firstName);
 }
