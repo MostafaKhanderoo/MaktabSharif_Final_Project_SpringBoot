@@ -26,4 +26,7 @@ public class Account extends BaseEntity<Long> {
     @ManyToOne
     private User user;
 
+    @ManyToOne
+    private Bank bank;
+
 }
