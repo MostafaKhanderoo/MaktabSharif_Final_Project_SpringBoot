@@ -1,6 +1,7 @@
 package com.example.maktabsharif.homeservices.entity;
 
 import com.example.maktabsharif.homeservices.entity.base.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -16,9 +17,11 @@ import lombok.*;
 @Table(name = "order_request")
 public class OrderRequest extends BaseEntity<Long> {
     @ManyToOne
+    @JsonIgnore
     private User SpecialistAcceptRequest;
 
     @ManyToOne
+    @JsonIgnore
     private Orders order;
 
     @Column(name = "specialist_suggestion")
