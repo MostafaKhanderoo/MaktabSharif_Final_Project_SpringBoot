@@ -1,12 +1,14 @@
 package com.example.maktabsharif.homeservices.service;
 
+import com.example.maktabsharif.homeservices.dto.servicedto.*;
 import com.example.maktabsharif.homeservices.entity.SubService;
 
 public interface ServiceManagementService {
-    void createService(String serviceName);
+    ServicesDTO createService(String serviceName);
 
-    void createSubService(String serviceName, String subServiceName, Double price, String description);
+    SubServiceDTO createSubService(SubServiceCreateDTO createDTO);
 
     SubService findSubServiceByName(String name);
+    SubService findSubServiceById(Long id);
 
 }
