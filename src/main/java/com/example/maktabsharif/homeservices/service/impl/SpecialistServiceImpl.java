@@ -48,7 +48,7 @@ public class SpecialistServiceImpl implements SpecialistService {
         user.setUserImage(createDTO.userImage());
 
         var saveCustomer =specialistRepository.save(user);
-        log.info("Customer with id {} saved", saveCustomer.getId());
+        log.info("specialist with id {} saved", saveCustomer.getId());
         return getDtoFromSpecialist(saveCustomer);
 
 
@@ -73,7 +73,7 @@ public class SpecialistServiceImpl implements SpecialistService {
                     ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
         if (specialistRepository.existsUserByUsernameAndRole(updateDTO.username(),Role.SPECIALIST))
-            throw new ExistsException("Customer with username {"
+            throw new ExistsException("specialist with username {"
                     + updateDTO.username() + "} already exists!",
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
@@ -91,10 +91,10 @@ public class SpecialistServiceImpl implements SpecialistService {
 
     @Override
     public UserDTO findById(Long id) {
-        Optional<User> specialist =specialistRepository.findUserByIdAndRole(id,Role.SPECIALIST);
+        Optional<User> specialist =specialistRepository.findById(id);
 
-        if(specialist.isEmpty())
-            throw new NotFoundException("Customer with id{"+
+        if(specialist.isEmpty() && !specialist.get().getRole().equals(Role.SPECIALIST))
+            throw new NotFoundException("specialist with id{"+
                     id+"} not found!"
                     ,CustomApiExceptionType.NOT_FOUND);
 
@@ -103,9 +103,25 @@ public class SpecialistServiceImpl implements SpecialistService {
     }
 
     @Override
+    public User findByIdUser(Long id) {
+        Optional<User>specialist =specialistRepository.findById(id);
+        if (specialist.isEmpty())
+            throw new NotFoundException("specialist with id{"+
+                    id+"} not found!"
+                    ,CustomApiExceptionType.NOT_FOUND);
+
+
+        if (!specialist.get().getRole().equals(Role.SPECIALIST))
+            throw new NotFoundException("You do not have access to place an order."
+                    ,CustomApiExceptionType.BAD_REQUEST);
+
+        return specialist.get();
+    }
+
+    @Override
     public void deleteById(Long id) {
         if (specialistRepository.findUserByIdAndRole(id,Role.SPECIALIST).isEmpty())
-            throw new NotFoundException("Customer with id{"+
+            throw new NotFoundException("specialist with id{"+
                     id+"} not found!"
                     ,CustomApiExceptionType.NOT_FOUND);
 
