@@ -17,11 +17,11 @@ import lombok.*;
 @Table(name = "order_request")
 public class OrderRequest extends BaseEntity<Long> {
     @ManyToOne
-    @JsonIgnore
+
     private User SpecialistAcceptRequest;
 
     @ManyToOne
-    @JsonIgnore
+
     private Orders order;
 
     @Column(name = "specialist_suggestion")
