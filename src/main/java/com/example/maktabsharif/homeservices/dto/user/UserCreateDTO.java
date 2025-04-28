@@ -1,10 +1,7 @@
 package com.example.maktabsharif.homeservices.dto.user;
 
-import com.example.maktabsharif.homeservices.enumeration.Role;
-import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import lombok.Builder;
-
-import java.time.LocalDateTime;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Builder
@@ -15,11 +12,7 @@ public record UserCreateDTO(
         String username,
         String password,
         String email,
-        LocalDateTime registerDate,
-        String userImage,
-        Role role,
-        UserStatus userStatus
-
+        MultipartFile profileImage
 ) {
 }
 
