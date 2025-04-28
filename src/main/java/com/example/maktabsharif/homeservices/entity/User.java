@@ -25,7 +25,10 @@ public class User extends BaseEntity<Long> {
     private String password;
     private String email;
     private LocalDateTime registerDate;
-    private String userImage;
+
+    @Column(nullable = false)
+    @Lob
+    private byte[] userImage;
     @Enumerated(EnumType.STRING)
     private Role role;
     @Enumerated(EnumType.STRING)
