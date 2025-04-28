@@ -16,7 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -54,7 +57,8 @@ public class ServiceManagementImpl implements ServiceManagementService {
         SubService subService = new SubService(createDTO.name(), createDTO.basePrice(), createDTO.description());
         service.addSubService(subService);
         subServiceRepository.save(subService);
-        log.info("subService with name{"+createDTO.name()+"} added");
+        log.info("subService with name{"+createDTO.name()
+                +"} added for service{"+createDTO.service().getName()+"}");
         return getDtoFromSubService(subService);
     }
 
@@ -73,6 +77,21 @@ public class ServiceManagementImpl implements ServiceManagementService {
         if (service.isEmpty())
             throw new NotFoundException("Service "+id+" not exists",CustomApiExceptionType.NOT_FOUND);
         return service.get();
+    }
+
+    @Override
+    public List<ServiceEntity> findAllService() {
+        return serviceRepository.findAll().stream()
+                .sorted(Comparator.comparing(ServiceEntity::getName))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SubService> findAllSubServiceByServiceName(String serviceName) {
+      return subServiceRepository.findAllByServiceName(serviceName);
+
+
+
     }
 
     private ServicesDTO getDtoFromService (ServiceEntity service){
