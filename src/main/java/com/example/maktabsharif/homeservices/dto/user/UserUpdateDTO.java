@@ -19,7 +19,7 @@ public record UserUpdateDTO(
         String password,
         String email,
         LocalDateTime registerDate,
-        String image,
+        MultipartFile image,
         Role role,
         UserStatus userStatus
 
