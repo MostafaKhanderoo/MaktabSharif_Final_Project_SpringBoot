@@ -6,14 +6,17 @@ import com.example.maktabsharif.homeservices.service.ManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
 @RestController
-@RequestMapping("manager")
+@RequestMapping("/api/manager")
 @RequiredArgsConstructor
 public class ManagerController {
     private final ManagerService managerService;
 
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> createManager(@ModelAttribute UserCreateDTO createDTO){
+    public ResponseEntity<UserDTO> createManager(@ModelAttribute UserCreateDTO createDTO) throws IOException {
         return ResponseEntity
                 .ok(managerService.savaManager(createDTO));
     }
