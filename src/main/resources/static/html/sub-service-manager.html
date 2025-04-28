@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add SubService</title>
+  <link rel="stylesheet" href="/css/subservice.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Add Subservice to Existing Services</h2>
+
+    <form id="subserviceForm">
+      <label for="service">Select Service:</label>
+      <select id="service" name="service" required>
+        <!-- Services will be dynamically loaded via JavaScript -->
+      </select>
+
+      <label for="subserviceName">SubService Name:</label>
+      <input type="text" id="subserviceName" name="subserviceName" placeholder="e.g., Kitchen Cleaning" required>
+
+     <label for="description">description:</label>
+          <input type="text" id="description" name="description" placeholder="" required>
+
+          <label for="basePrice">basePrice:</label>
+                  <input type="number" id="basePrice" name="basePrice" placeholder="100$" required>
+
+
+      <button type="submit">Add Subservice</button>
+    </form>
+
+    <p id="message"></p>
+  </div>
+
+  <script src="/js/add-subservice.js"></script>
+</body>
+</html>

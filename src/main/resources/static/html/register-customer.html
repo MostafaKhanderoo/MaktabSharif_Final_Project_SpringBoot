@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Customer</title>
+  <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Customer Registration</h2>
+    <form id="registerForm" enctype="multipart/form-data">
+      <input type="text" id="firstname" name="firstname" placeholder="first name" required>
+      <input type="text" id="lastname" name="lastname" placeholder="last name" required>
+      <input type="number" id="age" name="age" placeholder="age" required>
+      <input type="text" id="username" name="username" placeholder="user name" required>
+      <input type="password" id="password" name="password" placeholder="pass" required>
+      <input type="email" id="email" name="email" placeholder="email" required>
+      <input type="file" id="profileImage" name="profileImage" accept="image/*">
+      <button type="submit">register</button>
+    </form>
+    <p id="message"></p>
+  </div>
+
+  <script src="/js/register-customer.js"></script>
+</body>
+</html>
