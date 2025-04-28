@@ -16,7 +16,8 @@ public record UserResponseDTO(String firstName,
                               String email,
                               LocalDateTime registerDate,
                               Role role,
-                              UserStatus userStatus
+                              UserStatus userStatus,
+                              byte[] profileImage
 ) {
 
     public  static UserResponseDTO from(User user){
@@ -29,7 +30,8 @@ public record UserResponseDTO(String firstName,
                 user.getEmail(),
                 user.getRegisterDate(),
                 user.getRole(),
-                user.getUserStatus()
+                user.getUserStatus(),
+                user.getUserImage()
         );
     }
 }
