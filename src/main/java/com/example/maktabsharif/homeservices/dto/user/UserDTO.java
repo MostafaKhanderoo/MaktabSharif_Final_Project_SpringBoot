@@ -2,11 +2,14 @@ package com.example.maktabsharif.homeservices.dto.user;
 
 import com.example.maktabsharif.homeservices.enumeration.Role;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Getter
 public class UserDTO {
@@ -18,9 +21,9 @@ public class UserDTO {
     private String password;
     private String email;
     private LocalDateTime registerDate;
-    private String userImage;
     private Role role;
     private UserStatus userStatus;
+    private byte[] profileImage;
 
 
 }
