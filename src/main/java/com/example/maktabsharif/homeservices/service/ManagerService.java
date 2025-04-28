@@ -5,9 +5,11 @@ import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
 import com.example.maktabsharif.homeservices.entity.User;
 
+import java.io.IOException;
+
 public interface ManagerService {
-    UserDTO savaManager(UserCreateDTO createDTO);
-    UserDTO updateManager(UserUpdateDTO updateDTO);
+    UserDTO savaManager(UserCreateDTO createDTO) throws IOException;
+    UserDTO updateManager(UserUpdateDTO updateDTO) throws IOException;
     UserDTO findById(Long id);
     void deleteById(Long id);
 
