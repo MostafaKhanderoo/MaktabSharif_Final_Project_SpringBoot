@@ -7,16 +7,28 @@ import com.example.maktabsharif.homeservices.service.SpecialistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
-@RequestMapping("/specialist")
+@RequestMapping("/api/specialist")
 @RequiredArgsConstructor
 public class SpecialistController {
 
     private  final SpecialistService specialistService;
 
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> createSpecialist(@RequestBody UserCreateDTO createDTO){
+    public ResponseEntity<UserDTO> createSpecialist(
+            @RequestParam MultipartFile profileImage,
+            @RequestParam String firstname,
+            @RequestParam String lastname,
+            @RequestParam Long age,
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String email
+    ) throws IOException {
+        UserCreateDTO createDTO = new UserCreateDTO(firstname,lastname,age,username,password,email,profileImage);
         return ResponseEntity
                 .ok(specialistService.savaSpecialist(createDTO));
 
@@ -30,7 +42,7 @@ public class SpecialistController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<UserDTO> updateSpecialist(@RequestBody UserUpdateDTO updateDTO){
+    public ResponseEntity<UserDTO> updateSpecialist(@RequestBody UserUpdateDTO updateDTO) throws IOException {
         return ResponseEntity
                 .ok(specialistService.updateSpecialist(updateDTO));
     }
