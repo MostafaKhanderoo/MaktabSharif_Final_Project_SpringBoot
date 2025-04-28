@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ import java.util.Optional;
 public class SpecialistServiceImpl implements SpecialistService {
     private final UserRepository specialistRepository;
     @Override
-    public UserDTO savaSpecialist(UserCreateDTO createDTO) {
+    public UserDTO savaSpecialist(UserCreateDTO createDTO) throws IOException {
         if (specialistRepository.existsUserByUsernameAndRole(createDTO.username(), Role.SPECIALIST))
             throw new ExistsException("specialist with username{"+createDTO.username()+"} already exists!",
                     CustomApiExceptionType.INTERNAL_SERVER_ERROR);
@@ -45,7 +46,7 @@ public class SpecialistServiceImpl implements SpecialistService {
         user.setRegisterDate(LocalDateTime.now());
         user.setRole(Role.SPECIALIST);
         user.setUserStatus(UserStatus.PENDING);
-        user.setUserImage(createDTO.userImage());
+        user.setUserImage(createDTO.profileImage().getBytes());
 
         var saveCustomer =specialistRepository.save(user);
         log.info("specialist with id {} saved", saveCustomer.getId());
@@ -55,7 +56,7 @@ public class SpecialistServiceImpl implements SpecialistService {
     }
 
     @Override
-    public UserDTO updateSpecialist(UserUpdateDTO updateDTO) {
+    public UserDTO updateSpecialist(UserUpdateDTO updateDTO) throws IOException {
         if (specialistRepository.findUserByIdAndRole(updateDTO.id(),Role.SPECIALIST).isEmpty())
             throw new NotFoundException("specialist with id {"
                     + updateDTO.id() + "} not found!",
@@ -80,7 +81,7 @@ public class SpecialistServiceImpl implements SpecialistService {
         updateSpecialist.setUsername(updateDTO.username());
         updateSpecialist.setEmail(updateDTO.email());
         updateSpecialist.setPassword(updateDTO.password());
-        updateSpecialist.setUserImage(updateDTO.image());
+        updateSpecialist.setUserImage(updateDTO.image().getBytes());
 
         User saveSpecialist =specialistRepository.save(updateSpecialist);
         log.info("specialist with id {} updated", saveSpecialist.getId());
@@ -147,7 +148,7 @@ public class SpecialistServiceImpl implements SpecialistService {
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
                 .role(user.getRole())
-                .userImage(user.getUserImage())
+                .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
     }
