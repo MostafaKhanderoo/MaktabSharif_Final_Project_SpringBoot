@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class ManagerServiceImpl implements ManagerService {
 
 
     @Override
-    public UserDTO savaManager(UserCreateDTO createDTO) {
+    public UserDTO savaManager(UserCreateDTO createDTO) throws IOException {
         if (managerRepository.existsUserByUsernameAndRole(createDTO.username(), Role.MANAGER))
             throw new ExistsException("Manager with username {"
                     + createDTO.username() + "} already exists!",
@@ -46,7 +47,7 @@ public class ManagerServiceImpl implements ManagerService {
         user.setRegisterDate(LocalDateTime.now());
         user.setRole(Role.CUSTOMER);
         user.setUserStatus(UserStatus.PENDING);
-        user.setUserImage(createDTO.userImage());
+        user.setUserImage(createDTO.profileImage().getBytes());
 
         var saveManager =managerRepository.save(user);
         log.info("Manager with id {} saved", saveManager.getId());
@@ -54,7 +55,7 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public UserDTO updateManager(UserUpdateDTO updateDTO) {
+    public UserDTO updateManager(UserUpdateDTO updateDTO) throws IOException {
         if (managerRepository.findUserByIdAndRole(updateDTO.id(),Role.MANAGER).isEmpty())
             throw new NotFoundException("Customer with id {"
                     + updateDTO.id() + "} not found!",
@@ -79,7 +80,7 @@ public class ManagerServiceImpl implements ManagerService {
         updateCustomer.setUsername(updateDTO.username());
         updateCustomer.setEmail(updateDTO.email());
         updateCustomer.setPassword(updateDTO.password());
-        updateCustomer.setUserImage(updateDTO.image());
+        updateCustomer.setUserImage(updateDTO.image().getBytes());
 
         User savaManager =managerRepository.save(updateCustomer);
         log.info("Manager with id {} updated", savaManager.getId());
@@ -124,7 +125,7 @@ public class ManagerServiceImpl implements ManagerService {
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
                 .role(user.getRole())
-                .userImage(user.getUserImage())
+                .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
     }
