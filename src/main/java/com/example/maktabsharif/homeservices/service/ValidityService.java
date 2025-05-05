@@ -15,5 +15,6 @@ public interface ValidityService {
     void existsValidityForUser(User user);
     Optional<Validity>findValidityByUserId(Long id);
     void deleteValidityByUserId(Long id);
-
+    Validity updateValidityBalance(Validity validity);
+    Validity findById(Long id);
 }
