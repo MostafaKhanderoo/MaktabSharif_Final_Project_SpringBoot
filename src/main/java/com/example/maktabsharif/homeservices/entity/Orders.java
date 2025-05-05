@@ -23,7 +23,7 @@ public class Orders extends BaseEntity<Long> {
     @ManyToOne
     private User customerRequestService;
 
-    private double orderPriceRequest;
+    private Double orderPriceRequest;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
