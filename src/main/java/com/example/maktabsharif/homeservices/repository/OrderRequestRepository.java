@@ -18,10 +18,10 @@ public interface OrderRequestRepository extends JpaRepository<OrderRequest, Long
             (@Param("orderId") Long orderId, @Param("specialistId") Long specialistId);
 
     @Query("select c.SpecialistAcceptRequest from  OrderRequest c where c.order.customerRequestService.id = :customerOrderRequest")
-    List<User> findAllByCustomerRequestService(@Param("customerOrderRequest") Long customerOrderRequest);
+    List<User> findAllSpecialistAcceptRequest(@Param("customerOrderRequest") Long customerOrderRequest);
 
-
-
+    @Query("select order from OrderRequest order where order.order.id = :orderRequestId")
+    List<OrderRequest> getListRequestedSpecialist(@Param("orderRequestId") Long orderRequestId);
    // @Query
     //List<OrderRequest> findAllByOrder_IdAndSpecialistAcceptRequest_Id(Long orderId, Long specialistAcceptRequestId);
 
