@@ -8,6 +8,7 @@ import com.example.maktabsharif.homeservices.enumeration.Operator;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public interface CustomerService {
     UserDTO savaCustomer(UserCreateDTO createDTO) throws IOException;
@@ -18,7 +19,7 @@ public interface CustomerService {
 
     void deleteById(Long id);
 
-    User chooseLoginCustomerById(Long id);
+    Optional<User> chooseLoginCustomerById(Long id);
 
     User findUserByFirstName(String firstName);
 
