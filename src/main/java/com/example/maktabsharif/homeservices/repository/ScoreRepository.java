@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface ScoreRepository extends JpaRepository<Score,Long> {
-    @Query("SELECT c from Score c where c.orderId.id =:id")
+    @Query("SELECT c from Score c where c.order.id =:id")
     Optional<ScoreDto> findScoreByOrderId(@Param("id") Long id);
 }
