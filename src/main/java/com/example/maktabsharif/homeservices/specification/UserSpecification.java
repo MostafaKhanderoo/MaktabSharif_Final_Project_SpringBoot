@@ -1,6 +1,5 @@
 package com.example.maktabsharif.homeservices.specification;
 
-import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.entity.User;
 import com.example.maktabsharif.homeservices.enumeration.Operator;
 import org.springframework.data.jpa.domain.Specification;
