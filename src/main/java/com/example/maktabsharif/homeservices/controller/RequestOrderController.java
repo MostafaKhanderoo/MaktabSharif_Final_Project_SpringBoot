@@ -25,6 +25,10 @@ public class RequestOrderController {
     @GetMapping("/ordercustomer/{customerId}")
     public ResponseEntity<List<User>> allOrderOfCustomer(@PathVariable Long customerId){
      return ResponseEntity
-                .ok(orderRequest.listCustomerRequest(customerId));
+                .ok(orderRequest.listSpecialistAcceptRequest(customerId));
+    }
+    @GetMapping("/accept/specialist/list/{orderId}")
+    public ResponseEntity<List<OrderRequestDTO>>getAcceptOrderList(@PathVariable Long orderId){
+        return ResponseEntity.ok(orderRequest.listSpecialistRequestForOrder(orderId));
     }
 }
