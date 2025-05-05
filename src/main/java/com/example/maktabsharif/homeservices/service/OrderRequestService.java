@@ -13,7 +13,7 @@ public interface OrderRequestService {
 
     Optional<OrderRequestDTO> existsOrderRequestByOrderIdAndSpecialistId(Long orderId,Long specialistId);
 
-     List<User> listCustomerRequest(Long customerRequests);
+     List<User> listSpecialistAcceptRequest(Long customerRequests);
 
-    List<OrderRequestDTO> listSpecialistRequestForOrder(Long userId,Long orderId);
+    List<OrderRequestDTO> listSpecialistRequestForOrder(Long orderId);
 }
