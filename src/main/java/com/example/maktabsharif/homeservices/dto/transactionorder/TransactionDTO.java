@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class TransactionDTO {
+    private Long id;
     @Column(nullable = false)
     private String customerValidity;
     @Column(nullable = false)
