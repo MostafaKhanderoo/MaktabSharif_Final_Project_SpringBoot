@@ -20,7 +20,7 @@ import lombok.Setter;
 public class Score extends BaseEntity<Long> {
 
     @OneToOne
-    private User specialistId;
+    private User specialist;
 
     @Column(name = "specialist_score", nullable = false)
     @Min(0)
@@ -31,5 +31,5 @@ public class Score extends BaseEntity<Long> {
     @Column(length = 400)
     private String description;
     @OneToOne
-    private Orders orderId;
+    private Orders order;
 }
