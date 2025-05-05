@@ -1,17 +1,17 @@
 package com.example.maktabsharif.homeservices.dto.score;
 
-import com.example.maktabsharif.homeservices.entity.Orders;
-import com.example.maktabsharif.homeservices.entity.User;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 public record ScoreCreateDTO(
 
-        User specialistId,
+        Long specialistId,
         @Size(max = 5)
         @PositiveOrZero
-        int specialistScore,
+        @NotEmpty
+        Integer specialistScore,
         String description,
-        Orders orderId
+        Long orderId
 ) {
 }
