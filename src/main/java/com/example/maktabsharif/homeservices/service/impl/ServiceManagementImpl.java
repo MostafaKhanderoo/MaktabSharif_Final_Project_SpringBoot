@@ -63,20 +63,20 @@ public class ServiceManagementImpl implements ServiceManagementService {
     }
 
     @Override
-    public SubService findSubServiceByName(String name) {
+    public Optional<SubService> findSubServiceByName(String name) {
         Optional<SubService> service =subServiceRepository.findByName(name);
         if (service.isEmpty())
-            throw new NotFoundException("Service "+name+" not exists",CustomApiExceptionType.NOT_FOUND);
-        return service.get();
+            throw new NotFoundException("Service not exists",CustomApiExceptionType.NOT_FOUND);
+        return service;
 
     }
 
     @Override
-    public SubService findSubServiceById(Long id) {
+    public Optional<SubService> findSubServiceById(Long id) {
         Optional<SubService> service =subServiceRepository.findById(id);
         if (service.isEmpty())
             throw new NotFoundException("Service "+id+" not exists",CustomApiExceptionType.NOT_FOUND);
-        return service.get();
+        return service;
     }
 
     @Override
