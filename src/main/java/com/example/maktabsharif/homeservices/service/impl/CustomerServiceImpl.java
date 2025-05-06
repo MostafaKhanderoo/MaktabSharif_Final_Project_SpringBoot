@@ -132,14 +132,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public User chooseLoginCustomerById(Long id) {
+    public Optional<User> chooseLoginCustomerById(Long id) {
         var customerLog =userRepository.findUserByIdAndRole(id,Role.CUSTOMER);
         if (customerLog.isEmpty())
             throw new NotFoundException("Customer with id{"+
                     id+"} not found!"
                     ,CustomApiExceptionType.NOT_FOUND);
 
-        return  customerLog.get();
+        return  customerLog;
     }
 
     @Override
