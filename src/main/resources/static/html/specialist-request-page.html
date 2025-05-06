@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم پیشنهاد متخصصین</title>
+    <link rel="stylesheet" href="/css/specialist-orders.css">
+    </head>
+    <body>
+        <div class="form-container">
+            <h2>فرم ارسال پیشنهاد متخصص</h2>
+
+            <form id="orderRequestForm">
+                <input type="hidden" id="specialistId" name="SpecialistAcceptRequest" value="1"> <!-- مقدار واقعی باید از سیستم گرفته شود -->
+
+                <label for="selectedOrderId">سفارش انتخاب شده:</label>
+                <input type="text" id="selectedOrderId" readonly>
+                <input type="hidden" id="orderId" name="order" required>
+
+                <label for="suggestion">پیشنهاد قیمت (تومان):</label>
+                <input type="number" id="suggestion" name="SpecialistSuggestion" step="1000" min="0" required>
+
+                <button type="submit">ارسال پیشنهاد</button>
+            </form>
+
+            <h3>لیست سفارش‌های بدون متخصص</h3>
+            <div id="ordersListContainer">
+                <ul id="ordersList"></ul>
+            </div>
+
+            <div id="responseMessage"></div>
+        </div>
+
+        <script src="/js/specialist-order-accept.js"></script>
+    </body>
+    </html>
