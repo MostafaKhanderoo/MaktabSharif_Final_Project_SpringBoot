@@ -2,6 +2,7 @@ package com.example.maktabsharif.homeservices.service.impl;
 
 import com.example.maktabsharif.homeservices.dto.order.OrderCreateDTO;
 import com.example.maktabsharif.homeservices.dto.order.OrderDTO;
+import com.example.maktabsharif.homeservices.dto.order.OrderResponseDTO;
 import com.example.maktabsharif.homeservices.dto.order.OrderUpdateDTO;
 import com.example.maktabsharif.homeservices.entity.Orders;
 import com.example.maktabsharif.homeservices.enumeration.OrderStatus;
@@ -19,7 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -34,25 +37,44 @@ public class OrderServiceImpl implements OrderService {
     private final SpecialistService specialistService;
     @Override
     public OrderDTO addNewOrder(OrderCreateDTO createDTO) {
-        var service = serviceManagement.findSubServiceByName(createDTO.subService());
-       var customerLogg = customerService.chooseLoginCustomerById(createDTO.customerRequestService());
-        Orders order = new Orders();
 
-
-        if (service.getBasePrice() < createDTO.orderPriceRequest())
-            throw new InvalidInputException("price request must equals or must be more than service price.",
+        if (createDTO.subService() == null) {
+            throw   new InvalidInputException("زیرسرویس نمی‌تواند خالی باشد",
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
+        }
 
+        if (createDTO.customerRequestService() == null) {
+            throw new InvalidInputException("مشتری نمی‌تواند خالی باشد",
+                    CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
+        }
+
+
+        var service = serviceManagement.findSubServiceByName(createDTO.subService())
+                .orElseThrow(() -> new InvalidInputException("زیرسرویس یافت نشد",
+                        CustomApiExceptionType.NOT_FOUND));
+
+        var customer = customerService.chooseLoginCustomerById(createDTO.customerRequestService())
+                .orElseThrow(() -> new InvalidInputException("مشتری یافت نشد",
+                        CustomApiExceptionType.NOT_FOUND));
+
+
+        if (service.getBasePrice() > createDTO.orderPriceRequest()) {
+            throw new InvalidInputException(
+                    "قیمت پیشنهادی باید بیشتر یا مساوی قیمت پایه سرویس باشد. قیمت پایه: " + service.getBasePrice(),
+                    CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
+        }
+
+
+        Orders order = new Orders();
         order.setOrderPriceRequest(createDTO.orderPriceRequest());
         order.setOrderStatus(OrderStatus.PENDING_OFFERS);
-        order.setCustomerRequestService(customerLogg);
+        order.setCustomerRequestService(customer);
         order.setSubService(service);
 
-        var orderSaved= ordersRepository.save(order);
 
-        log.info("customer with id{"+orderSaved.getId()+"} saved");
+        var orderSaved = ordersRepository.save(order);
+
         return getDtoFromOrder(orderSaved);
-
     }
 
     @Override
@@ -110,6 +132,50 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    @Override
+    public List<OrderResponseDTO> getAllNullSpecialistOrder() {
+        var ordersList= ordersRepository.getListOrderSpecialistNull();
+        return ordersList.stream()
+                .map(orders ->new  OrderResponseDTO(
+                        orders.getId(),
+                        orders.getSubService().getService().getName(),
+                        orders.getSubService().getName() ,
+                        orders.getCustomerRequestService().getFirstname(),
+                        orders.getOrderPriceRequest(),
+                        orders.getOrderStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderResponseDTO> ordersOfCustomer(Long customerRequestedId) {
+        var ordersCustomer =
+                ordersRepository.getOrdersByCustomerRequestServiceId(customerRequestedId);
+        return ordersCustomer.stream()
+                .map(orders -> new OrderResponseDTO(
+                        orders.getId(),
+                        orders.getSubService().getService().getName(),
+                        orders.getSubService().getName() ,
+                        orders.getCustomerRequestService().getFirstname(),
+                        orders.getOrderPriceRequest(),
+                        orders.getOrderStatus()))
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public OrderDTO customerChooseSpecialist(Long orderId, Long specialistId) {
+        var orderChooses= findById(orderId).get();
+        var specialistAccept =specialistService.findByIdUser(specialistId);
+
+       orderChooses.setOrderStatus(OrderStatus.AWAITING_ARRIVAL);
+       orderChooses.setSpecialistAccepted(specialistAccept);
+
+       ordersRepository.save(orderChooses);
+       log.info(specialistAccept.getFirstname()+" accepted for order id {"+orderId+"}");
+       return getDtoFromOrder(orderChooses);
+
+
+    }
 
 
     private OrderDTO getDtoFromOrder(Orders order) {
