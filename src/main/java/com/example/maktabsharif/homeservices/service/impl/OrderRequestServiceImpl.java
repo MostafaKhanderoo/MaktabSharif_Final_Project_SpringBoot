@@ -18,13 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class OrderRequestServiceImpl implements OrderRequestService {
-    private  final OrderRequestRepository ordersRepository;
+    private  final OrderRequestRepository orderRequestRepository;
     private final SpecialistService specialistService;
     private final OrderService orderService;
     private final CustomerService customerService;
@@ -39,7 +40,7 @@ public class OrderRequestServiceImpl implements OrderRequestService {
                 (orderRequestDTO.SpecialistAcceptRequest());
 
         var order= orderService.findById(orderRequestDTO.order());
-        if(ordersRepository.findOrderRequestByOrderIdAndSpecialistAcceptRequestId(orderRequestDTO.order(),
+        if(orderRequestRepository.findOrderRequestByOrderIdAndSpecialistAcceptRequestId(orderRequestDTO.order(),
                 orderRequestDTO.SpecialistAcceptRequest()).isPresent())
             throw new ExistsException("request is exists for order with id{" +orderRequestDTO.order()+
                     "}and specialist id{"+orderRequestDTO.SpecialistAcceptRequest()+"}",
@@ -49,7 +50,7 @@ public class OrderRequestServiceImpl implements OrderRequestService {
         orderRequest.setOrder(order.get());
         orderRequest.setSpecialistAcceptRequest(specialist);
         orderRequest.setSpecialistSuggestion(orderRequestDTO.SpecialistSuggestion());
-        ordersRepository.save(orderRequest);
+        orderRequestRepository.save(orderRequest);
         log.info("Request add for order{"+orderRequestDTO.order()+
                 "and specialist{"+orderRequestDTO.SpecialistAcceptRequest());
         return getOrderRequest(orderRequest);
@@ -62,15 +63,23 @@ public class OrderRequestServiceImpl implements OrderRequestService {
     }
 
     @Override
-    public List<OrderRequestDTO> listSpecialistRequestForOrder(Long userId, Long orderId) {
-        return null;
+    public List<OrderRequestDTO> listSpecialistRequestForOrder(Long orderId) {
+       var orderRequest= orderRequestRepository.getListRequestedSpecialist(orderId);
+     return   orderRequest.stream()
+               .map(ordersRequest ->new OrderRequestDTO(
+                       ordersRequest.getId(),
+                       ordersRequest.getSpecialistAcceptRequest(),
+                       ordersRequest.getOrder(),
+                       ordersRequest.getSpecialistSuggestion()
+
+               )).collect(Collectors.toList());
     }
 
     @Override
-    public List <User> listCustomerRequest(Long customerRequests) {
+    public List <User> listSpecialistAcceptRequest(Long customerRequests) {
       var customerRequest=  customerService.chooseLoginCustomerById(customerRequests);
         var listOrderRequest=
-                ordersRepository.findAllByCustomerRequestService(customerRequests);
+                orderRequestRepository.findAllSpecialistAcceptRequest(customerRequests);
        return listOrderRequest;
     }
 
