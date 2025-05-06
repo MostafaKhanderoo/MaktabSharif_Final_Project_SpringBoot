@@ -5,8 +5,10 @@ import com.example.maktabsharif.homeservices.entity.User;
 import com.example.maktabsharif.homeservices.entity.Validity;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
 import com.example.maktabsharif.homeservices.exception.ExistsException;
+import com.example.maktabsharif.homeservices.exception.NotFoundException;
 import com.example.maktabsharif.homeservices.repository.ValidityRepository;
 import com.example.maktabsharif.homeservices.service.ValidityService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,21 @@ public class ValidityServiceImpl implements ValidityService {
 
     @Override
     public Validity updateValidity(Validity validity) {
-        return null;
+
+        Validity existingValidity = validityRepository.findById(validity.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Validity not found with id: " + validity.getId()));
+
+
+        existingValidity.setAddress(validity.getAddress());
+        existingValidity.setAccountLock(validity.isAccountLock());
+        existingValidity.setBalance(validity.getBalance());
+        existingValidity.setUser(validity.getUser());
+
+
+        Validity updatedValidity = validityRepository.save(existingValidity);
+        log.info("Validity with id {} updated successfully", validity.getId());
+
+        return updatedValidity;
     }
 
     @Override
@@ -57,7 +73,10 @@ public class ValidityServiceImpl implements ValidityService {
 
     @Override
     public Optional<Validity> findValidityByAddress(String address) {
-        return Optional.empty();
+     if (validityRepository.findValidityByAddress(address).isEmpty())
+     throw new NotFoundException("validity not found for address{"+address+"} not found!",
+             CustomApiExceptionType.NOT_FOUND);
+     return validityRepository.findValidityByAddress(address);
     }
 
     @Override
@@ -77,7 +96,7 @@ public class ValidityServiceImpl implements ValidityService {
     @Override
     public Optional<Validity> findValidityByUserId(Long id) {
         if (validityRepository.findValidityByUserId(id).isEmpty())
-            throw new ExistsException("validity not found for user id{"+id+"} not found!" ,
+            throw new NotFoundException("validity not found for user id{"+id+"} not found!" ,
                     CustomApiExceptionType.NOT_FOUND);
 
         return validityRepository.findValidityByUserId(id);
@@ -88,6 +107,19 @@ public class ValidityServiceImpl implements ValidityService {
         findValidityByUserId(id);
         validityRepository.deleteValidityByUserId(id);
         log.info("validity of user id{"+id+"} deleted");
+    }
+
+    @Override
+    public Validity updateValidityBalance(Validity validity) {
+return null;
+    }
+
+    @Override
+    public Validity findById(Long id) {
+        if (validityRepository.findValidityByUserId(id).isEmpty())
+            throw new NotFoundException("validity not found for user id{"+id+"} not found!" ,
+                    CustomApiExceptionType.NOT_FOUND);
+        return validityRepository.findById(id).get();
     }
 
 
