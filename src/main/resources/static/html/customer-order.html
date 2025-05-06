@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ثبت سفارش سرویس</title>
   <link rel="stylesheet" href="/css/order.css">
 </head>
@@ -10,20 +11,33 @@
     <h2>ثبت سفارش</h2>
 
     <form id="orderForm">
-      <label for="serviceSelect">انتخاب سرویس:</label>
-    <select id="serviceSelect">
 
-    </select>
-      </select>
-
-      <div id="subservicesContainer" class="subservice-box">
-        <p>زیرسرویس‌ها:</p>
-        <!-- Subservices will load here -->
+      <!-- انتخاب سرویس -->
+      <div class="form-group">
+        <label for="serviceSelect">انتخاب سرویس:</label>
+        <select id="serviceSelect" class="form-control" required>
+          <option value="">-- انتخاب سرویس --</option>
+          <!-- Option ها با جاوااسکریپت لود می‌شوند -->
+        </select>
       </div>
 
+      <!-- انتخاب زیرسرویس -->
+      <div id="subservicesContainer" class="subservice-box">
+        <label>زیرسرویس‌ها:</label>
+        <!-- زیرسرویس‌ها به صورت radio button اضافه می‌شوند -->
+      </div>
+
+      <!-- قیمت پیشنهادی -->
+      <div class="form-group">
+        <label for="orderPrice">قیمت پیشنهادی:</label>
+        <input type="number" id="orderPrice" class="form-control" placeholder="قیمت را وارد کنید" required min="0">
+      </div>
+
+      <!-- دکمه ثبت سفارش -->
       <button type="submit" class="submit-btn">ثبت سفارش</button>
     </form>
 
+    <!-- پیام موفقیت یا خطا -->
     <p id="message" class="message"></p>
   </div>
 

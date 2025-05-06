@@ -1,125 +1,152 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     const serviceSelect = document.getElementById("serviceSelect");
     const subservicesContainer = document.getElementById("subservicesContainer");
     const orderForm = document.getElementById("orderForm");
     const message = document.getElementById("message");
+    let priceInput = createPriceInput();
 
-    // بارگذاری سرویس‌ها
-    fetch("http://localhost:8080/api/service/allservices")
-        .then(res => res.json())
-        .then(data => {
-            console.log("📦 سرویس‌ها:", data);
+    loadServices();
 
-            data.forEach(service => {
-                const option = document.createElement("option");
-                option.value = service.name;  // استفاده از نام سرویس به عنوان مقدار
-                option.textContent = service.name;
+    serviceSelect.addEventListener("change", handleServiceChange);
+    orderForm.addEventListener("submit", handleFormSubmit);
+
+    async function loadServices() {
+        try {
+            const response = await fetch("http://localhost:8080/api/service/allservices");
+            if (!response.ok) throw new Error("خطا در بارگذاری سرویس‌ها");
+            const services = await response.json();
+            services.forEach(service => {
+                const option = new Option(service.name, service.name);
                 serviceSelect.appendChild(option);
             });
-        })
-        .catch(err => {
-            console.error("خطا در دریافت سرویس‌ها:", err);
-            message.textContent = "❌ بارگذاری سرویس‌ها با خطا مواجه شد.";
-            message.style.color = "red";
-        });
+        } catch (err) {
+            showError("❌ بارگذاری سرویس‌ها ناموفق بود: " + err.message);
+        }
+    }
 
-    // بارگذاری زیرسرویس‌ها وقتی سرویسی انتخاب میشه
-    serviceSelect.addEventListener("change", function () {
+    async function handleServiceChange() {
         const serviceName = serviceSelect.value;
-        console.log("🔵 Selected serviceName:", serviceName);
-
         if (!serviceName) {
             subservicesContainer.innerHTML = "<p>لطفاً یک سرویس انتخاب کنید.</p>";
             return;
         }
 
-        const url = `http://localhost:8080/api/service/subService/${encodeURIComponent(serviceName)}`;
-        console.log("📦 Sending request to:", url);
+        try {
+            const url = `http://localhost:8080/api/service/subService/${encodeURIComponent(serviceName)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("خطا در دریافت زیرسرویس‌ها");
 
-        fetch(url)
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(subservices => {
-                console.log("✅ Received subservices:", subservices);
-                subservicesContainer.innerHTML = "";
+            const subservices = await response.json();
+            renderSubservices(subservices);
+        } catch (err) {
+            showError("❌ دریافت زیرسرویس‌ها ناموفق بود: " + err.message);
+        }
+    }
 
-                if (!subservices || subservices.length === 0) {
-                    subservicesContainer.innerHTML = "<p>هیچ زیرسرویسی برای این سرویس وجود ندارد.</p>";
-                    return;
-                }
+    function renderSubservices(subservices) {
+        subservicesContainer.innerHTML = "";
 
-                subservices.forEach(sub => {
-                    const div = document.createElement("div");
-                    div.classList.add("subservice-item");
-
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.id = `sub-${sub.id}`;
-                    checkbox.value = sub.id;
-                    checkbox.name = "subservices";
-
-                    const label = document.createElement("label");
-                    label.htmlFor = `sub-${sub.id}`;
-                    label.appendChild(document.createTextNode(sub.name));
-
-                    div.appendChild(checkbox);
-                    div.appendChild(label);
-                    subservicesContainer.appendChild(div);
-                });
-            })
-            .catch(err => {
-                console.error("❌ خطا در دریافت زیرسرویس‌ها:", err);
-                subservicesContainer.innerHTML = `<p>خطا در بارگذاری زیرسرویس‌ها: ${err.message}</p>`;
-            });
-    });
-
-    // ارسال سفارش
-    orderForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const selectedService = serviceSelect.value;
-        const selectedSubservices = Array.from(
-            document.querySelectorAll('input[name="subservices"]:checked')
-        ).map(cb => cb.value);
-
-        if (!selectedService || selectedSubservices.length === 0) {
-            message.textContent = "لطفاً سرویس و حداقل یک زیرسرویس را انتخاب کنید.";
-            message.style.color = "red";
+        if (!subservices.length) {
+            subservicesContainer.innerHTML = "<p>زیرسرویسی وجود ندارد.</p>";
             return;
         }
 
-        const order = {
-            serviceName: selectedService,
-            subserviceIds: selectedSubservices
-        };
+        const title = document.createElement("h4");
+        title.textContent = "زیرسرویس‌ها";
+        subservicesContainer.appendChild(title);
 
-        console.log("📤 Submitting order:", order);
+        subservices.forEach(sub => {
+            const div = document.createElement("div");
+            div.className = "form-check mb-2";
 
-        fetch("http://localhost:8080/api/order/create", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(order)
-        })
-            .then(res => {
-                if (!res.ok) {
-                    return res.text().then(text => { throw new Error(text) });
-                }
-                return res.json();
-            })
-            .then(data => {
-                message.textContent = "✅ سفارش با موفقیت ثبت شد.";
-                message.style.color = "green";
-                orderForm.reset();
-                subservicesContainer.innerHTML = "";
-            })
-            .catch(err => {
-                console.error("خطا در ثبت سفارش:", err);
-                message.textContent = `❌ ثبت سفارش با خطا مواجه شد: ${err.message}`;
-                message.style.color = "red";
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "subService";
+            radio.value = sub.name;
+            radio.id = `sub-${sub.id}`;
+            radio.className = "form-check-input";
+            radio.dataset.basePrice = sub.basePrice;
+            radio.dataset.subServiceId = sub.id;
+
+            const label = document.createElement("label");
+            label.className = "form-check-label";
+            label.htmlFor = radio.id;
+            label.innerHTML = `${sub.name} <span class="text-muted">(قیمت پایه: ${sub.basePrice} تومان)</span>`;
+
+            div.append(radio, label);
+            subservicesContainer.appendChild(div);
+        });
+
+        subservicesContainer.appendChild(priceInput);
+    }
+
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        clearMessage();
+
+        try {
+            const selectedSub = document.querySelector('input[name="subService"]:checked');
+            if (!selectedSub) throw new Error("لطفاً یک زیرسرویس انتخاب کنید");
+
+            const offeredPrice = parseFloat(priceInput.value);
+            const basePrice = parseFloat(selectedSub.dataset.basePrice);
+            const subServiceId = selectedSub.dataset.subServiceId;
+
+            if (isNaN(offeredPrice)) throw new Error("قیمت پیشنهادی نامعتبر است");
+            if (offeredPrice < basePrice) throw new Error(`قیمت باید حداقل ${basePrice} تومان باشد`);
+
+            const orderData = {
+                subService: selectedSub.value,
+                customerRequestService: localStorage.getItem("customerId") || "6",
+                orderPriceRequest: offeredPrice,
+
+            };
+
+
+            const response = await fetch("http://localhost:8080/api/order/create", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData)
             });
-    });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "خطا در ثبت سفارش");
+            }
+
+            showSuccess("✅ سفارش شما با موفقیت ثبت شد.");
+            orderForm.reset();
+            subservicesContainer.innerHTML = "";
+        } catch (err) {
+            showError("❌ " + err.message);
+        }
+    }
+
+    function createPriceInput() {
+        const input = document.createElement("input");
+        input.type = "number";
+        input.className = "form-control mt-3";
+        input.placeholder = "قیمت پیشنهادی (تومان)";
+        input.required = true;
+        input.id = "orderPrice";
+        return input;
+    }
+
+    function showSuccess(text) {
+        message.textContent = text;
+        message.style.color = "green";
+        setTimeout(clearMessage, 4000);
+    }
+
+    function showError(text) {
+        message.textContent = text;
+        message.style.color = "red";
+        setTimeout(clearMessage, 5000);
+    }
+
+    function clearMessage() {
+        message.textContent = "";
+    }
 });
