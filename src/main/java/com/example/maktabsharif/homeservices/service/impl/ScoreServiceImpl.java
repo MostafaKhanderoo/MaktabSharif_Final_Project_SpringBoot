@@ -3,11 +3,14 @@ package com.example.maktabsharif.homeservices.service.impl;
 import com.example.maktabsharif.homeservices.dto.score.ScoreCreateDTO;
 import com.example.maktabsharif.homeservices.dto.score.ScoreDto;
 import com.example.maktabsharif.homeservices.dto.score.ScoreUpdateDTO;
+import com.example.maktabsharif.homeservices.entity.Orders;
 import com.example.maktabsharif.homeservices.entity.Score;
+import com.example.maktabsharif.homeservices.entity.User;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
 import com.example.maktabsharif.homeservices.exception.ExistsException;
 import com.example.maktabsharif.homeservices.exception.InvalidInputException;
 import com.example.maktabsharif.homeservices.repository.ScoreRepository;
+import com.example.maktabsharif.homeservices.service.OrderService;
 import com.example.maktabsharif.homeservices.service.ScoreSetSpecialistService;
 import com.example.maktabsharif.homeservices.service.SpecialistService;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +26,10 @@ import java.util.Optional;
 public class ScoreServiceImpl implements ScoreSetSpecialistService {
     private final ScoreRepository scoreRepository;
     private final SpecialistService specialistService;
-
+    private final OrderService orderService;
     @Override
     public ScoreDto addScoreSpecialist(ScoreCreateDTO scoreCreateDTO) {
-        checkOrderHasScore(scoreCreateDTO.orderId().getId());
+        checkOrderHasScore(scoreCreateDTO.orderId());
 
 
         Score score = new Score();
@@ -35,13 +38,14 @@ public class ScoreServiceImpl implements ScoreSetSpecialistService {
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
 
-        specialistService.findByIdUser(scoreCreateDTO.specialistId().getId());
+      User specialist=  specialistService.findByIdUser(scoreCreateDTO.specialistId());
         score.setSpecialistScore(scoreCreateDTO.specialistScore());
-        score.setSpecialistId(scoreCreateDTO.specialistId());
+        score.setSpecialist(specialist);
         score.setDescription(scoreCreateDTO.description());
-        score.setOrderId(scoreCreateDTO.orderId());
+        Orders order= orderService.findById(scoreCreateDTO.orderId()).get();
+        score.setOrder(order);
         scoreRepository.save(score);
-        log.info("Score set for specialist with id{" + score.getSpecialistId() + "}");
+        log.info("Score set for specialist with id{" + score.getSpecialist().getFirstname() + "}");
         return getScoreDto(score);
     }
 
@@ -86,10 +90,10 @@ public class ScoreServiceImpl implements ScoreSetSpecialistService {
     private ScoreDto getScoreDto(Score score) {
         return ScoreDto.builder()
                 .id(score.getId())
-                .specialistId(score.getSpecialistId())
+                .specialistId(score.getSpecialist())
                 .specialistScore(score.getSpecialistScore())
                 .description(score.getDescription())
-                .orderId(score.getOrderId())
+                .orderId(score.getOrder())
                 .build();
 
 
