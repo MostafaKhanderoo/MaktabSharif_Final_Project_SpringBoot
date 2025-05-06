@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سفارشات من</title>
+    <link rel="stylesheet" href="/css/accept-specialist.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">سفارشات من</h1>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        لیست سفارشات
+                    </div>
+                    <div class="card-body">
+                        <div id="loading-orders" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">در حال بارگذاری...</span>
+                            </div>
+                        </div>
+                        <div id="orders-list" class="list-group"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        جستجوی سفارش
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="customer-id" class="form-label">شناسه مشتری</label>
+                            <input type="number" class="form-control" id="customer-id" value="1">
+                        </div>
+                        <button id="load-orders-btn" class="btn btn-primary w-100">بارگذاری سفارشات</button>
+                    </div>
+                </div>
+
+                <div class="card" id="specialists-card" style="display: none;">
+                    <div class="card-header bg-success text-white">
+                        متخصصان برای سفارش انتخاب شده
+                    </div>
+                    <div class="card-body">
+                        <div id="loading-specialists" class="text-center" style="display: none;">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">در حال بارگذاری...</span>
+                            </div>
+                        </div>
+                        <div id="specialists-list" class="list-group"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Specialist Selection -->
+    <div class="modal fade" id="specialistModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تایید انتخاب متخصص</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>آیا مطمئن هستید که می‌خواهید این متخصص را برای سفارش خود انتخاب کنید؟</p>
+                    <div id="specialist-details"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="button" class="btn btn-primary" id="confirm-select">تایید انتخاب</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/accept-request-order.js"></script>
+</body>
+</html>
