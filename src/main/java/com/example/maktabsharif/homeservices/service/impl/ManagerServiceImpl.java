@@ -3,17 +3,20 @@ package com.example.maktabsharif.homeservices.service.impl;
 import com.example.maktabsharif.homeservices.dto.user.UserCreateDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
+import com.example.maktabsharif.homeservices.entity.Role;
 import com.example.maktabsharif.homeservices.entity.User;
-import com.example.maktabsharif.homeservices.enumeration.Role;
+import com.example.maktabsharif.homeservices.enumeration.RoleName;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
 import com.example.maktabsharif.homeservices.exception.ExistsException;
 import com.example.maktabsharif.homeservices.exception.InvalidInputException;
 import com.example.maktabsharif.homeservices.exception.NotFoundException;
+import com.example.maktabsharif.homeservices.repository.RoleRepository;
 import com.example.maktabsharif.homeservices.repository.UserRepository;
 import com.example.maktabsharif.homeservices.service.ManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +31,13 @@ import java.util.Optional;
 public class ManagerServiceImpl implements ManagerService {
 
     private final UserRepository managerRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
     public UserDTO savaManager(UserCreateDTO createDTO) throws IOException {
-        if (managerRepository.existsUserByUsernameAndRole(createDTO.username(), Role.MANAGER))
+        if (managerRepository.existsUserByUsernameAndRole(createDTO.username(), RoleName.MANAGER))
             throw new ExistsException("Manager with username {"
                     + createDTO.username() + "} already exists!",
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
@@ -42,10 +47,13 @@ public class ManagerServiceImpl implements ManagerService {
         user.setLastname(createDTO.lastname());
         user.setAge(createDTO.age());
         user.setUsername(createDTO.username());
-        user.setPassword(createDTO.password());
+        user.setPassword(passwordEncoder.encode(createDTO.password()));
         user.setEmail(createDTO.email());
         user.setRegisterDate(LocalDateTime.now());
-        user.setRole(Role.CUSTOMER);
+
+        Role role =roleRepository.findByName(RoleName.MANAGER)
+                .orElseThrow(()->new NotFoundException(CustomApiExceptionType.NOT_FOUND));
+        user.setRole(role);
         user.setUserStatus(UserStatus.PENDING);
         user.setUserImage(createDTO.profileImage().getBytes());
 
@@ -56,7 +64,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public UserDTO updateManager(UserUpdateDTO updateDTO) throws IOException {
-        if (managerRepository.findUserByIdAndRole(updateDTO.id(),Role.MANAGER).isEmpty())
+        if (managerRepository.findUserByIdAndRole(updateDTO.id(), RoleName.MANAGER).isEmpty())
             throw new NotFoundException("Customer with id {"
                     + updateDTO.id() + "} not found!",
                     CustomApiExceptionType.NOT_FOUND);
@@ -72,7 +80,7 @@ public class ManagerServiceImpl implements ManagerService {
             throw new InvalidInputException("Age must be 18 or older!"
                     ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
-        if (managerRepository.existsUserByUsernameAndRole(updateDTO.username(),Role.CUSTOMER))
+        if (managerRepository.existsUserByUsernameAndRole(updateDTO.username(), RoleName.CUSTOMER))
             throw new ExistsException("Manager with username {"
                     + updateDTO.username() + "} already exists!",
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
@@ -89,7 +97,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public UserDTO findById(Long id) {
-        Optional<User> manager =managerRepository.findUserByIdAndRole(id ,Role.MANAGER);
+        Optional<User> manager =managerRepository.findUserByIdAndRole(id , RoleName.MANAGER);
 
         if (manager.isEmpty())
             throw new NotFoundException("Manager with id{"+
@@ -101,7 +109,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public void deleteById(Long id) {
-        if(managerRepository.findUserByIdAndRole(id,Role.MANAGER).isEmpty())
+        if(managerRepository.findUserByIdAndRole(id, RoleName.MANAGER).isEmpty())
             throw new NotFoundException("Manager with id{"+
                     id+"} not found!"
                     ,CustomApiExceptionType.NOT_FOUND);
@@ -124,7 +132,7 @@ public class ManagerServiceImpl implements ManagerService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole())
+                .role(user.getRole().getRoleName())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();

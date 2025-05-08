@@ -3,17 +3,20 @@ package com.example.maktabsharif.homeservices.service.impl;
 import com.example.maktabsharif.homeservices.dto.user.UserCreateDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
+import com.example.maktabsharif.homeservices.entity.Role;
 import com.example.maktabsharif.homeservices.entity.User;
-import com.example.maktabsharif.homeservices.enumeration.Role;
+import com.example.maktabsharif.homeservices.enumeration.RoleName;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
 import com.example.maktabsharif.homeservices.exception.ExistsException;
 import com.example.maktabsharif.homeservices.exception.InvalidInputException;
 import com.example.maktabsharif.homeservices.exception.NotFoundException;
+import com.example.maktabsharif.homeservices.repository.RoleRepository;
 import com.example.maktabsharif.homeservices.repository.UserRepository;
 import com.example.maktabsharif.homeservices.service.SpecialistService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,9 +28,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SpecialistServiceImpl implements SpecialistService {
     private final UserRepository specialistRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public UserDTO savaSpecialist(UserCreateDTO createDTO) throws IOException {
-        if (specialistRepository.existsUserByUsernameAndRole(createDTO.username(), Role.SPECIALIST))
+        if (specialistRepository.existsUserByUsernameAndRole(createDTO.username(), RoleName.SPECIALIST))
             throw new ExistsException("specialist with username{"+createDTO.username()+"} already exists!",
                     CustomApiExceptionType.INTERNAL_SERVER_ERROR);
 
@@ -41,10 +46,12 @@ public class SpecialistServiceImpl implements SpecialistService {
                     ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
         user.setAge(createDTO.age());
         user.setUsername(createDTO.username());
-        user.setPassword(createDTO.password());
+        user.setPassword(passwordEncoder.encode(createDTO.password()));
         user.setEmail(createDTO.email());
         user.setRegisterDate(LocalDateTime.now());
-        user.setRole(Role.SPECIALIST);
+        Role role =roleRepository.findByName(RoleName.SPECIALIST)
+                .orElseThrow(()->new NotFoundException(CustomApiExceptionType.NOT_FOUND));
+        user.setRole(role);
         user.setUserStatus(UserStatus.PENDING);
         user.setUserImage(createDTO.profileImage().getBytes());
 
@@ -57,7 +64,7 @@ public class SpecialistServiceImpl implements SpecialistService {
 
     @Override
     public UserDTO updateSpecialist(UserUpdateDTO updateDTO) throws IOException {
-        if (specialistRepository.findUserByIdAndRole(updateDTO.id(),Role.SPECIALIST).isEmpty())
+        if (specialistRepository.findUserByIdAndRole(updateDTO.id(), RoleName.SPECIALIST).isEmpty())
             throw new NotFoundException("specialist with id {"
                     + updateDTO.id() + "} not found!",
                     CustomApiExceptionType.NOT_FOUND);
@@ -73,7 +80,7 @@ public class SpecialistServiceImpl implements SpecialistService {
             throw new InvalidInputException("Age must be 18 or older!"
                     ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
-        if (specialistRepository.existsUserByUsernameAndRole(updateDTO.username(),Role.SPECIALIST))
+        if (specialistRepository.existsUserByUsernameAndRole(updateDTO.username(), RoleName.SPECIALIST))
             throw new ExistsException("specialist with username {"
                     + updateDTO.username() + "} already exists!",
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
@@ -94,7 +101,7 @@ public class SpecialistServiceImpl implements SpecialistService {
     public UserDTO findById(Long id) {
         Optional<User> specialist =specialistRepository.findById(id);
 
-        if(specialist.isEmpty() && !specialist.get().getRole().equals(Role.SPECIALIST))
+        if(specialist.isEmpty() && !specialist.get().getRole().equals(RoleName.SPECIALIST))
             throw new NotFoundException("specialist with id{"+
                     id+"} not found!"
                     ,CustomApiExceptionType.NOT_FOUND);
@@ -112,7 +119,7 @@ public class SpecialistServiceImpl implements SpecialistService {
                     ,CustomApiExceptionType.NOT_FOUND);
 
 
-        if (!specialist.get().getRole().equals(Role.SPECIALIST))
+        if (!specialist.get().getRole().equals(RoleName.SPECIALIST))
             throw new NotFoundException("You do not have access to place an order."
                     ,CustomApiExceptionType.BAD_REQUEST);
 
@@ -121,7 +128,7 @@ public class SpecialistServiceImpl implements SpecialistService {
 
     @Override
     public void deleteById(Long id) {
-        if (specialistRepository.findUserByIdAndRole(id,Role.SPECIALIST).isEmpty())
+        if (specialistRepository.findUserByIdAndRole(id, RoleName.SPECIALIST).isEmpty())
             throw new NotFoundException("specialist with id{"+
                     id+"} not found!"
                     ,CustomApiExceptionType.NOT_FOUND);
@@ -147,7 +154,7 @@ public class SpecialistServiceImpl implements SpecialistService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole())
+                .role(user.getRole().getRoleName())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();

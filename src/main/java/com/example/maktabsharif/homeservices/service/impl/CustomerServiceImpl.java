@@ -3,24 +3,28 @@ package com.example.maktabsharif.homeservices.service.impl;
 import com.example.maktabsharif.homeservices.dto.user.UserCreateDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
+import com.example.maktabsharif.homeservices.entity.Role;
 import com.example.maktabsharif.homeservices.entity.User;
 import com.example.maktabsharif.homeservices.enumeration.Operator;
-import com.example.maktabsharif.homeservices.enumeration.Role;
+import com.example.maktabsharif.homeservices.enumeration.RoleName;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
 import com.example.maktabsharif.homeservices.exception.ExistsException;
 import com.example.maktabsharif.homeservices.exception.InvalidInputException;
 import com.example.maktabsharif.homeservices.exception.NotFoundException;
+import com.example.maktabsharif.homeservices.repository.RoleRepository;
 import com.example.maktabsharif.homeservices.repository.UserRepository;
 import com.example.maktabsharif.homeservices.service.CustomerService;
-
 import com.example.maktabsharif.homeservices.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -32,14 +36,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class CustomerServiceImpl implements CustomerService {
+public class CustomerServiceImpl implements CustomerService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final ValidityServiceImpl validityService;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDTO savaCustomer(UserCreateDTO createDTO) throws IOException {
-        if (userRepository.existsUserByUsernameAndRole(createDTO.username(), Role.CUSTOMER))
+        if (userRepository.existsUserByUsernameAndRole(createDTO.username(), RoleName.CUSTOMER))
             throw new ExistsException("Customer with username {"
                     + createDTO.username() + "} already exists!",
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
@@ -57,12 +63,14 @@ public class CustomerServiceImpl implements CustomerService {
         }
         user.setAge(createDTO.age());
         user.setUsername(createDTO.username());
-        user.setPassword(createDTO.password());
+        user.setPassword(passwordEncoder.encode(createDTO.password()));
         user.setEmail(createDTO.email());
         user.setRegisterDate(LocalDateTime.now());
-        user.setRole(Role.CUSTOMER);
+        Role role =roleRepository.findByName(RoleName.CUSTOMER)
+                .orElseThrow(()->new NotFoundException(CustomApiExceptionType.NOT_FOUND));
+        user.setRole(role);
         user.setUserStatus(UserStatus.PENDING);
-        MultipartFile file = createDTO.profileImage();
+
 
         user.setUserImage(createDTO.profileImage().getBytes());
 
@@ -90,7 +98,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new   InvalidInputException("Age must be 18 or older!"
                     ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
-        if (userRepository.existsUserByUsernameAndRole(updateDTO.username(),Role.CUSTOMER))
+        if (userRepository.existsUserByUsernameAndRole(updateDTO.username(), RoleName.CUSTOMER))
             throw new ExistsException("Customer with username {"
                     + updateDTO.username() + "} already exists!",
                     CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
@@ -108,7 +116,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public UserDTO findByIdAndRole(Long id) {
-        Optional<User> customer =userRepository.findUserByIdAndRole(id,Role.CUSTOMER);
+        Optional<User> customer =userRepository.findUserByIdAndRole(id, RoleName.CUSTOMER);
         if (customer.isEmpty())
             throw new NotFoundException("Customer with id{"+
                     id+"} not found!"
@@ -119,7 +127,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteById(Long id) {
-        if (userRepository.findUserByIdAndRole(id,Role.CUSTOMER).isEmpty())
+        if (userRepository.findUserByIdAndRole(id, RoleName.CUSTOMER).isEmpty())
             throw new NotFoundException("Customer with id{"+
                     id+"} not found!"
                     ,CustomApiExceptionType.NOT_FOUND);
@@ -133,7 +141,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Optional<User> chooseLoginCustomerById(Long id) {
-        var customerLog =userRepository.findUserByIdAndRole(id,Role.CUSTOMER);
+        var customerLog =userRepository.findUserByIdAndRole(id, RoleName.CUSTOMER);
         if (customerLog.isEmpty())
             throw new NotFoundException("Customer with id{"+
                     id+"} not found!"
@@ -144,7 +152,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public User findUserByFirstName(String firstName) {
-        return   userRepository.findUserByRoleAndFirstname(Role.CUSTOMER,firstName);
+        return   userRepository.findUserByRoleAndFirstname(RoleName.CUSTOMER,firstName);
     }
 
     @Override
@@ -181,7 +189,7 @@ public class CustomerServiceImpl implements CustomerService {
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole(),
+                        user.getRole().getRoleName(),
                         user.getUserStatus(),
                         user.getUserImage()))
                 .collect(Collectors.toList());
@@ -202,7 +210,7 @@ public class CustomerServiceImpl implements CustomerService {
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole(),
+                        user.getRole().getRoleName(),
                         user.getUserStatus(),
                         user.getUserImage()))
                 .collect(Collectors.toList());
@@ -210,7 +218,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<UserDTO> getAllUser() {
-        List<User> customers = userRepository.findAllByRole(Role.CUSTOMER);
+        List<User> customers = userRepository.findAllByRole(RoleName.CUSTOMER);
         return customers.stream()
                 .map(user -> new UserDTO(
                         user.getId(),
@@ -221,7 +229,7 @@ public class CustomerServiceImpl implements CustomerService {
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole(),
+                        user.getRole().getRoleName(),
                         user.getUserStatus(),
                         user.getUserImage().clone()))
                 .collect(Collectors.toList());
@@ -237,9 +245,17 @@ public class CustomerServiceImpl implements CustomerService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole())
+                .role(user.getRole().getRoleName())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+      return   userRepository.findByUsername(username)
+              .orElseThrow(()->new NotFoundException(CustomApiExceptionType.NOT_FOUND));
+
+
     }
 }
