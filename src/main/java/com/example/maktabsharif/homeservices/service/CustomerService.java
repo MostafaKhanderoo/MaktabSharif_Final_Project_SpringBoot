@@ -5,12 +5,13 @@ import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
 import com.example.maktabsharif.homeservices.entity.User;
 import com.example.maktabsharif.homeservices.enumeration.Operator;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public interface CustomerService {
+public interface CustomerService extends UserDetailsService {
     UserDTO savaCustomer(UserCreateDTO createDTO) throws IOException;
 
     UserDTO updateCustomer(UserUpdateDTO updateDTO) throws IOException;
