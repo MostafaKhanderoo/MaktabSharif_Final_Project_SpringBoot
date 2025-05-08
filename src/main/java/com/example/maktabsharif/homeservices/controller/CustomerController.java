@@ -7,10 +7,12 @@ import com.example.maktabsharif.homeservices.enumeration.Operator;
 import com.example.maktabsharif.homeservices.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -37,7 +39,11 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> findById(
+            @PathVariable Long id,
+            Principal principal,
+            Authentication authentication
+    ) {
         return ResponseEntity
                 .ok(customerService.findByIdAndRole(id));
 
@@ -68,15 +74,15 @@ public class CustomerController {
     @GetMapping("/search/age")
     public ResponseEntity<List<UserDTO>> searchByAge(
             @RequestParam(required = false) Long age,
-            @RequestParam(required = false)Operator operator
-            ){
-        List<UserDTO>users =customerService.searchUserByAge(age,operator);
+            @RequestParam(required = false) Operator operator
+    ) {
+        List<UserDTO> users = customerService.searchUserByAge(age, operator);
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/all/customers")
-    public ResponseEntity<List<UserDTO>> getAllCustomers(){
-       return ResponseEntity.ok(customerService.getAllUser());
+    public ResponseEntity<List<UserDTO>> getAllCustomers() {
+        return ResponseEntity.ok(customerService.getAllUser());
     }
 
 }
