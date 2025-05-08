@@ -1,7 +1,7 @@
 package com.example.maktabsharif.homeservices.dto.user;
 
 import com.example.maktabsharif.homeservices.entity.User;
-import com.example.maktabsharif.homeservices.enumeration.Role;
+import com.example.maktabsharif.homeservices.entity.Role;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import lombok.Builder;
 

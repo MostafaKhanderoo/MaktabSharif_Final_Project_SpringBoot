@@ -1,6 +1,5 @@
 package com.example.maktabsharif.homeservices.dto.user;
 
-import com.example.maktabsharif.homeservices.enumeration.Role;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -20,7 +19,6 @@ public record UserUpdateDTO(
         String email,
         LocalDateTime registerDate,
         MultipartFile image,
-        Role role,
         UserStatus userStatus
 
 ) {
