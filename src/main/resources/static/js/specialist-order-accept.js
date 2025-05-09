@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // بارگذاری اولیه لیست سفارش‌ها
+
     loadOrders();
 
-    // مدیریت ارسال فرم
+
     document.getElementById("orderRequestForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const orderId = document.getElementById("orderId").value;
         const suggestion = document.getElementById("suggestion").value;
 
-        // اعتبارسنجی فرم
+
         if (!orderId) {
             showResponse("لطفاً یک سفارش از لیست انتخاب کنید", false);
             return;
@@ -45,9 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(data => {
                 showResponse("پیشنهاد شما با موفقیت ثبت شد", true);
-                // بارگذاری مجدد لیست پس از ارسال موفق
+
                 loadOrders();
-                // پاک کردن فرم
+
                 resetForm();
             })
             .catch(error => {
@@ -56,13 +56,13 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // دکمه بازنشانی فرم
+
     document.getElementById("resetForm").addEventListener("click", function() {
         resetForm();
     });
 });
 
-// تابع برای بارگذاری لیست سفارش‌های موجود
+
 function loadOrders() {
     fetch("http://localhost:8080/api/order/order/list")
         .then(response => {
@@ -115,50 +115,50 @@ function loadOrders() {
         });
 }
 
-// تابع برای انتخاب یک سفارش از لیست
+
 function selectOrder(order, element) {
     // حذف کلاس selected از همه آیتم‌ها
     document.querySelectorAll(".order-item").forEach(item => {
         item.classList.remove("selected");
     });
 
-    // اضافه کردن کلاس selected به آیتم انتخاب شده
+
     element.classList.add("selected");
 
-    // پر کردن فیلدهای فرم
+
     document.getElementById("orderId").value = order.id;
     document.getElementById("selectedOrderId").value = `سفارش #${order.id} - ${order.serviceName}`;
 
-    // تنظیم حداقل قیمت پیشنهادی و placeholder
+
     const suggestionInput = document.getElementById("suggestion");
     suggestionInput.min = order.orderPriceRequest || 0;
     suggestionInput.placeholder = `حداقل ${order.orderPriceRequest ? order.orderPriceRequest.toLocaleString() + ' تومان' : 'مقداری مشخص نشده'}`;
 }
 
-// تابع برای نمایش پیام‌های پاسخ سرور
+
 function showResponse(message, isSuccess) {
     const responseDiv = document.getElementById("responseMessage");
     responseDiv.textContent = message;
     responseDiv.className = isSuccess ? "success" : "error";
     responseDiv.style.display = "block";
 
-    // مخفی کردن خودکار پیام پس از 5 ثانیه
+
     setTimeout(() => {
         responseDiv.style.display = "none";
     }, 5000);
 }
 
-// تابع برای بازنشانی فرم
+
 function resetForm() {
     document.getElementById("orderRequestForm").reset();
     document.getElementById("orderId").value = "";
     document.getElementById("selectedOrderId").value = "هیچ سفارشی انتخاب نشده";
 
-    // حذف انتخاب از لیست
+
     document.querySelectorAll(".order-item").forEach(item => {
         item.classList.remove("selected");
     });
 
-    // مخفی کردن پیام‌ها
+
     document.getElementById("responseMessage").style.display = "none";
 }
