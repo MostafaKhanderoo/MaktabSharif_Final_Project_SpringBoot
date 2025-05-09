@@ -3,16 +3,19 @@ package com.example.maktabsharif.homeservices.controller;
 import com.example.maktabsharif.homeservices.dto.user.UserCreateDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
+import com.example.maktabsharif.homeservices.entity.User;
 import com.example.maktabsharif.homeservices.enumeration.Operator;
+import com.example.maktabsharif.homeservices.enumeration.RoleName;
 import com.example.maktabsharif.homeservices.service.CustomerService;
+import com.example.maktabsharif.homeservices.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -21,6 +24,7 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final UserService userService;
 
     @PostMapping("/create")
     public ResponseEntity<UserDTO> createCustomer(
@@ -35,15 +39,15 @@ public class CustomerController {
         UserCreateDTO createDTO = new UserCreateDTO(firstname, lastname, age, username, password, email, profileImage);
         createDTO.firstname();
         return ResponseEntity
-                .ok(customerService.savaCustomer(createDTO));
+                .ok(userService.saveUser(createDTO, RoleName.CUSTOMER));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> findById(
             @PathVariable Long id,
-            Principal principal,
-            Authentication authentication
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        var u = (User) userDetails;
         return ResponseEntity
                 .ok(customerService.findByIdAndRole(id));
 
@@ -82,7 +86,7 @@ public class CustomerController {
 
     @GetMapping("/all/customers")
     public ResponseEntity<List<UserDTO>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllUser());
+        return ResponseEntity.ok(userService.getAllUser());
     }
 
 }
