@@ -21,12 +21,19 @@ public class SecurityConfig {
             ,UserService userService
     ) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> authorize.
-                       requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                        .requestMatchers("/api/**").authenticated().anyRequest().denyAll())
-                .httpBasic(Customizer.withDefaults());
 
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/customer/create").permitAll()
+                        .requestMatchers("/api/manager/**").hasAuthority("MANAGER")
+                        .requestMatchers("/api/specialist/**").hasAuthority("SPECIALIST")
+                        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                        //.requestMatchers(HttpMethod.GET, "/v1/contact/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll()
+                )
+                .userDetailsService(userService)
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
