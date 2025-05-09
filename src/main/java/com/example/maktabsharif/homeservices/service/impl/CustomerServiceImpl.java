@@ -18,10 +18,8 @@ import com.example.maktabsharif.homeservices.service.CustomerService;
 import com.example.maktabsharif.homeservices.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +34,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class CustomerServiceImpl implements CustomerService, UserDetailsService {
+@Primary
+public class CustomerServiceImpl implements CustomerService {
 
     private final UserRepository userRepository;
     private final ValidityServiceImpl validityService;
@@ -45,10 +44,10 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
 
     @Override
     public UserDTO savaCustomer(UserCreateDTO createDTO) throws IOException {
-        if (userRepository.existsUserByUsernameAndRole(createDTO.username(), RoleName.CUSTOMER))
-            throw new ExistsException("Customer with username {"
-                    + createDTO.username() + "} already exists!",
-                    CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
+//        if (userRepository.existsUserByUsernameAndRole(createDTO.username(), RoleName.CUSTOMER))
+//            throw new ExistsException("Customer with username {"
+//                    + createDTO.username() + "} already exists!",
+//                    CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
 
         User user = new User();
@@ -189,7 +188,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole().getRoleName(),
+                        user.getRole(),
                         user.getUserStatus(),
                         user.getUserImage()))
                 .collect(Collectors.toList());
@@ -210,7 +209,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole().getRoleName(),
+                        user.getRole(),
                         user.getUserStatus(),
                         user.getUserImage()))
                 .collect(Collectors.toList());
@@ -229,7 +228,7 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole().getRoleName(),
+                        user.getRole(),
                         user.getUserStatus(),
                         user.getUserImage().clone()))
                 .collect(Collectors.toList());
@@ -245,17 +244,10 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole().getRoleName())
+                .role(user.getRole())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-      return   userRepository.findByUsername(username)
-              .orElseThrow(()->new NotFoundException(CustomApiExceptionType.NOT_FOUND));
-
-
-    }
 }

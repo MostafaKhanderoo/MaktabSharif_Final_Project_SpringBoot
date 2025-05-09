@@ -132,7 +132,7 @@ public class ManagerServiceImpl implements ManagerService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole().getRoleName())
+                .role(user.getRole())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
