@@ -1,11 +1,8 @@
 package com.example.maktabsharif.homeservices.entity;
 
 import com.example.maktabsharif.homeservices.entity.base.BaseEntity;
-import com.example.maktabsharif.homeservices.enumeration.RoleName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.*;
 
 @Entity
@@ -16,10 +13,11 @@ import lombok.*;
 @Builder
 
 public class Role extends BaseEntity<Long> {
-
-    @Column
-    @Enumerated(EnumType.STRING)
-    private RoleName roleName;
+    public static final String CUSTOMER = "ROLE_CUSTOMER";
+    public static final String EXPERT = "ROLE_EXPERT";
+    public static final String ADMIN = "ROLE_ADMIN";
+    @Column(nullable = false,unique = true)
+    private String name;
 
 
 
