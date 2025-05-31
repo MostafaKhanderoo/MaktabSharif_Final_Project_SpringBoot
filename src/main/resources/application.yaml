@@ -23,3 +23,9 @@ spring:
               valid-extensions: jpg,png,jpeg,pdf,xlsx,xls,doc,docx
               download:
                 block-size: 8080
+
+
+  security:
+    user:
+      name: admin
+      password: admin
