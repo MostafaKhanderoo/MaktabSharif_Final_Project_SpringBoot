@@ -3,7 +3,6 @@ package com.example.maktabsharif.homeservices.configuration;
 import com.example.maktabsharif.homeservices.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,13 +23,15 @@ public class SecurityConfig {
 
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/customer/create").permitAll()
-                        .requestMatchers("/api/manager/**").hasAuthority("MANAGER")
-                        .requestMatchers("/api/specialist/**").hasAuthority("SPECIALIST")
+                                .requestMatchers("/html/**")
+                                .permitAll()
+                        .requestMatchers("/api/specialist/create",
+                                "/api/customer/create").permitAll()
+                        .requestMatchers("/api/manager/**").hasRole("MANAGER")
+                        .requestMatchers("/api/specialist/**").hasRole("EXPERT")
                         .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                         //.requestMatchers(HttpMethod.GET, "/v1/contact/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
+
                 )
                 .userDetailsService(userService)
                 .httpBasic(Customizer.withDefaults());
