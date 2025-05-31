@@ -1,33 +1,24 @@
 package com.example.maktabsharif.homeservices.service.impl;
 
-import com.example.maktabsharif.homeservices.dto.user.UserCreateDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserDTO;
-import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
-import com.example.maktabsharif.homeservices.entity.Role;
 import com.example.maktabsharif.homeservices.entity.User;
 import com.example.maktabsharif.homeservices.enumeration.Operator;
 import com.example.maktabsharif.homeservices.enumeration.RoleName;
-import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
-import com.example.maktabsharif.homeservices.exception.InvalidInputException;
+import com.example.maktabsharif.homeservices.exception.ExistsException;
 import com.example.maktabsharif.homeservices.exception.NotFoundException;
-import com.example.maktabsharif.homeservices.repository.RoleRepository;
 import com.example.maktabsharif.homeservices.repository.UserRepository;
 import com.example.maktabsharif.homeservices.service.UserService;
-import com.example.maktabsharif.homeservices.service.ValidityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,62 +27,66 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ValidityService validityService;
-    private final RoleRepository roleRepository;
 
 
 
     @Override
-    public UserDTO saveUser(UserCreateDTO createDTO, RoleName roleName) throws IOException {
-
-        User user = new User();
-
-
-        user.setFirstname(createDTO.firstname());
-        user.setLastname(createDTO.lastname());
-        if (createDTO.age() >=18){
-            user.setAge(createDTO.age());
-        }else {
-            throw new InvalidInputException("Age must be 18 or older!"
-                    , CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
-        }
-
-        user.setUsername(createDTO.username());
-        user.setPassword(passwordEncoder.encode(createDTO.password()));
-        user.setEmail(createDTO.email());
-        user.setRegisterDate(LocalDateTime.now());
-        Role role = roleRepository.findByName(RoleName.CUSTOMER)
-                .orElseThrow(() -> new NotFoundException("Role not found",CustomApiExceptionType.NOT_FOUND));
-        user.setRole(role);
-        user.setUserStatus(UserStatus.ACTIVE);
-
-
-        user.setUserImage(createDTO.profileImage().getBytes());
-
-        var saveUser =userRepository.save(user);
-        validityService.createValidityForUser(user);
-        log.info(roleName+" with id {} saved", saveUser.getId());
-        return getDtoFromUser(saveUser);
+    public User saveUser(User user) throws IOException {
+        if (userRepository.existsByUsername(user.getUsername()))
+            throw new ExistsException(user.getUsername()+ "already exist"
+                    ,CustomApiExceptionType.UNAUTHORIZED);
+        if(userRepository.existsByEmail(user.getEmail()))
+            throw new ExistsException(user.getEmail()+ "already exist"
+                    ,CustomApiExceptionType.UNAUTHORIZED);
+        user.setPassword(
+                passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
     @Override
-    public UserDTO updateUser(UserUpdateDTO updateDTO) throws IOException {
-        return null;
+    public User updateUser(User user) throws IOException {
+        if (StringUtils.hasText(user.getFirstname()))
+            user.setFirstname(user.getFirstname());
+        if (StringUtils.hasText(user.getLastname()))
+            user.setLastname(user.getLastname());
+        if (userRepository.existsByUsername(user.getUsername()))
+            throw new ExistsException(user.getUsername()+" already exist"
+                    ,CustomApiExceptionType.UNAUTHORIZED);
+        if (user.getAge() <18)
+            throw new IllegalArgumentException("user must be older than 18");
+        if(userRepository.existsByEmail(user.getEmail()))
+            throw new ExistsException(user.getEmail()+ " already exist"
+                    ,CustomApiExceptionType.UNAUTHORIZED);
+
+
+        user.setPassword(
+                passwordEncoder.encode(user.getPassword()));
+
+        return userRepository.save(user);
     }
 
+
+
+
     @Override
-    public UserDTO findByIdAndRole(Long id) {
-        return null;
+    public User findById(Long id) {
+     return userRepository.findById(id)
+             .orElseThrow(()->new  NotFoundException("User with id {"+id+"} not found!",
+                     CustomApiExceptionType.NOT_FOUND));
     }
 
     @Override
     public void deleteById(Long id) {
-
+        findById(id);
+        userRepository.deleteById(id);
+        log.info("User with id {"+id+"} deleted!");
     }
 
     @Override
-    public Optional<User> chooseLoginUserById(Long id) {
-        return Optional.empty();
+    public User chooseLoginUserById(Long id) {
+        return  userRepository.findById(id)
+                .orElseThrow(()->new  NotFoundException("user with this id "+id+" not found!"
+                        ,CustomApiExceptionType.NOT_FOUND));
     }
 
     @Override
@@ -127,7 +122,6 @@ public class UserServiceImpl implements UserService {
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole(),
                         user.getUserStatus(),
                         user.getUserImage().clone()))
                 .collect(Collectors.toList());
@@ -135,18 +129,19 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-       User user=   userRepository.findByUsername(username)
-                .orElseThrow(()->
-                        new UsernameNotFoundException("User not found with username: " + username));
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                user.getUserStatus() == UserStatus.PENDING,
-                true, true, true,
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName().name()))
+    public UserDetails loadUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
 
-        );
+        // ساخت UserDetails با اطلاعات کامل کاربر
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword())
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
+                .build();
     }
     private UserDTO getDtoFromUser(User user) {
         return UserDTO.builder()
@@ -158,7 +153,6 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
