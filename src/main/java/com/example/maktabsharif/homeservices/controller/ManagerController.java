@@ -16,7 +16,7 @@ public class ManagerController {
     private final ManagerService managerService;
 
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> createManager(@ModelAttribute UserCreateDTO createDTO) throws IOException {
+    public ResponseEntity<UserDTO> createManager(@RequestBody UserCreateDTO createDTO) throws IOException {
         return ResponseEntity
                 .ok(managerService.savaManager(createDTO));
     }
@@ -25,6 +25,7 @@ public class ManagerController {
     public ResponseEntity<UserDTO> getManagerById(@RequestParam(name = "id") Long id){
         return ResponseEntity
                 .ok(managerService.findById(id));
+
 
     }
 
