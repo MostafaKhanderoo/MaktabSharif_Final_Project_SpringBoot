@@ -9,9 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Builder
@@ -30,44 +29,26 @@ public class User extends BaseEntity<Long> implements UserDetails {
     private String email;
     private LocalDateTime registerDate;
 
-    @Column(nullable = false)
+
     @Lob
+
     private byte[] userImage;
 
-    @ManyToOne(fetch = FetchType.EAGER) // تغییر مهم: اضافه کردن FetchType.EAGER
-    @JoinColumn(nullable = false) // مشخص کردن نام ستون
-    private Role role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    Set<Role> role = new HashSet<>();
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
+
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == null || this.role.getRoleName() == null) {
-            return Collections.emptyList();
-        }
-        return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + this.role.getRoleName().name())
-        );
+        return role.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return userStatus != null && userStatus == UserStatus.ACTIVE;    }
     @Override
     public String getPassword() {
         return password;
