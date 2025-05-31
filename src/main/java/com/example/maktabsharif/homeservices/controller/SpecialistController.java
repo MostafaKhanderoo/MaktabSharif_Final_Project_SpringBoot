@@ -1,5 +1,6 @@
     package com.example.maktabsharif.homeservices.controller;
 
+    import com.example.maktabsharif.homeservices.dto.user.SpecialistCreateDTO;
     import com.example.maktabsharif.homeservices.dto.user.UserCreateDTO;
     import com.example.maktabsharif.homeservices.dto.user.UserDTO;
     import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
@@ -31,9 +32,9 @@
                 @RequestParam String password,
                 @RequestParam String email
         ) throws IOException {
-            UserCreateDTO createDTO = new UserCreateDTO(firstname,lastname,age,username,password,email,profileImage);
+            SpecialistCreateDTO createDTO = new SpecialistCreateDTO(firstname,lastname,age,username,password,email,profileImage);
             return ResponseEntity
-                    .ok(userService.saveUser(createDTO, RoleName.SPECIALIST));
+                    .ok(specialistService.savaSpecialist(createDTO));
 
         }
 
