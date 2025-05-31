@@ -12,10 +12,11 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> , JpaSpecificationExecutor<User> {
 
-    Optional<User> findUserById(Long id);
+    Optional<User> findById(Long id);
     Boolean existsUserByUsernameAndRole(String username, RoleName role);
     Optional <User> findUserByIdAndRole(Long id, RoleName role);
     List<User> findUserByRole(RoleName role);
+
 
 
 
@@ -23,5 +24,8 @@ public interface UserRepository extends JpaRepository<User,Long> , JpaSpecificat
     Optional<User>findByUsername(String username);
     Optional<User>findByEmail(String email);
     List<User> findAllByRole(RoleName role);
+    Boolean existsByUsername(String username);
+    Boolean existsByEmail(String email);
+    void deleteById(Long id);
 
 }
