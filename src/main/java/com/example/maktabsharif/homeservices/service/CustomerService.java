@@ -16,13 +16,12 @@ public interface CustomerService {
 
     UserDTO updateCustomer(UserUpdateDTO updateDTO) throws IOException;
 
-    UserDTO findByIdAndRole(Long id);
+    UserDTO findById(Long id);
 
     void deleteById(Long id);
 
     Optional<User> chooseLoginCustomerById(Long id);
 
-    User findUserByFirstName(String firstName);
 
     void  changePassword (Long userId,String currentPassword,String newPassword);
 
