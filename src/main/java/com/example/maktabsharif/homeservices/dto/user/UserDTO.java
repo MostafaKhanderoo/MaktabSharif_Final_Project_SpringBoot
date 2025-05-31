@@ -21,7 +21,7 @@ public class UserDTO {
     private String password;
     private String email;
     private LocalDateTime registerDate;
-    private Role role;
+
     private UserStatus userStatus;
     private byte[] profileImage;
 
