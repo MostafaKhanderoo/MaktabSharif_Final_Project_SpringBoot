@@ -9,18 +9,16 @@ import com.example.maktabsharif.homeservices.enumeration.Operator;
 import com.example.maktabsharif.homeservices.enumeration.RoleName;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
-import com.example.maktabsharif.homeservices.exception.ExistsException;
 import com.example.maktabsharif.homeservices.exception.InvalidInputException;
 import com.example.maktabsharif.homeservices.exception.NotFoundException;
-import com.example.maktabsharif.homeservices.repository.RoleRepository;
 import com.example.maktabsharif.homeservices.repository.UserRepository;
 import com.example.maktabsharif.homeservices.service.CustomerService;
+import com.example.maktabsharif.homeservices.service.RoleService;
 import com.example.maktabsharif.homeservices.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +34,11 @@ import java.util.stream.Collectors;
 @Transactional
 @Primary
 public class CustomerServiceImpl implements CustomerService {
-
     private final UserRepository userRepository;
+    private final UserServiceImpl userService;
     private final ValidityServiceImpl validityService;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+
 
     @Override
     public UserDTO savaCustomer(UserCreateDTO createDTO) throws IOException {
@@ -51,29 +49,18 @@ public class CustomerServiceImpl implements CustomerService {
 
 
         User user = new User();
-
         user.setFirstname(createDTO.firstname());
         user.setLastname(createDTO.lastname());
-        if (createDTO.age() >=18){
-            user.setAge(createDTO.age());
-        }else {
-            throw new InvalidInputException("Age must be 18 or older!"
-                    , CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
-        }
-        user.setAge(createDTO.age());
         user.setUsername(createDTO.username());
-        user.setPassword(passwordEncoder.encode(createDTO.password()));
+        user.setPassword(createDTO.password());
+        user.setAge(createDTO.age());
         user.setEmail(createDTO.email());
         user.setRegisterDate(LocalDateTime.now());
-        Role role =roleRepository.findByName(RoleName.CUSTOMER)
-                .orElseThrow(()->new NotFoundException(CustomApiExceptionType.NOT_FOUND));
-        user.setRole(role);
+        Role role =roleService.findByName(Role.CUSTOMER);
+        user.getRole().add(role);
         user.setUserStatus(UserStatus.PENDING);
 
-
-        user.setUserImage(createDTO.profileImage().getBytes());
-
-        var saveCustomer =userRepository.save(user);
+        var saveCustomer =userService.saveUser(user);
         validityService.createValidityForUser(user);
         log.info("Customer with id {} saved", saveCustomer.getId());
         return getDtoFromCustomer(saveCustomer);
@@ -81,47 +68,37 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public UserDTO updateCustomer(UserUpdateDTO updateDTO) throws IOException {
-        if (userRepository.findUserById(updateDTO.id()).isEmpty())
-            throw new NotFoundException("Customer with id {"
-                    + updateDTO.id() + "} not found!",
-                    CustomApiExceptionType.NOT_FOUND);
+        userService.findById(updateDTO.id());
 
-        User updateCustomer = userRepository.findUserById(updateDTO.id()).get();
+        User user = userService.chooseLoginUserById(updateDTO.id());
 
-        updateCustomer.setFirstname(updateDTO.firstname());
-        updateCustomer.setLastname(updateDTO.lastname());
+        user.setFirstname(updateDTO.firstname());
+        user.setLastname(updateDTO.lastname());
 
         if (updateDTO.age() >=18){
-            updateCustomer.setAge(updateDTO.age());
+            user.setAge(updateDTO.age());
         }else
             throw new   InvalidInputException("Age must be 18 or older!"
                     ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
-        if (userRepository.existsUserByUsernameAndRole(updateDTO.username(), RoleName.CUSTOMER))
-            throw new ExistsException("Customer with username {"
-                    + updateDTO.username() + "} already exists!",
-                    CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
-        updateCustomer.setUsername(updateDTO.username());
-        updateCustomer.setEmail(updateDTO.email());
-        updateCustomer.setPassword(updateDTO.password());
-        updateCustomer.setUserImage(updateDTO.image().getBytes());
 
-        User savedCustomer =userRepository.save(updateCustomer);
+        user.setUsername(updateDTO.username());
+        user.setEmail(updateDTO.email());
+        user.setPassword(updateDTO.password());
+        user.setUserImage(updateDTO.image().getBytes());
+
+            User savedCustomer =userService.updateUser(user);
         log.info("Customer with id {} updated", savedCustomer.getId());
         return getDtoFromCustomer(savedCustomer);
 
     }
 
     @Override
-    public UserDTO findByIdAndRole(Long id) {
-        Optional<User> customer =userRepository.findUserByIdAndRole(id, RoleName.CUSTOMER);
-        if (customer.isEmpty())
-            throw new NotFoundException("Customer with id{"+
-                    id+"} not found!"
-                    ,CustomApiExceptionType.NOT_FOUND);
+    public UserDTO findById(Long id) {
+        User customer =userService.findById(id);
 
-        return getDtoFromCustomer(customer.get());
+        return getDtoFromCustomer(customer);
     }
 
     @Override
@@ -149,16 +126,11 @@ public class CustomerServiceImpl implements CustomerService {
         return  customerLog;
     }
 
-    @Override
-    public User findUserByFirstName(String firstName) {
-        return   userRepository.findUserByRoleAndFirstname(RoleName.CUSTOMER,firstName);
-    }
+
 
     @Override
     public void changePassword(Long userId, String currentPassword, String newPassword) {
-      User user=  userRepository.findUserById(userId)
-                .orElseThrow(()-> new NotFoundException("Customer not found"
-                        ,CustomApiExceptionType.NOT_FOUND));
+      User user=  userService.findById(userId);
 
       if (!user.getPassword().equals(currentPassword))
           throw new  InvalidInputException("Current password is wrong!"
@@ -188,7 +160,6 @@ public class CustomerServiceImpl implements CustomerService {
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole(),
                         user.getUserStatus(),
                         user.getUserImage()))
                 .collect(Collectors.toList());
@@ -209,7 +180,7 @@ public class CustomerServiceImpl implements CustomerService {
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole(),
+
                         user.getUserStatus(),
                         user.getUserImage()))
                 .collect(Collectors.toList());
@@ -228,7 +199,7 @@ public class CustomerServiceImpl implements CustomerService {
                         user.getPassword(),
                         user.getEmail(),
                         user.getRegisterDate(),
-                        user.getRole(),
+
                         user.getUserStatus(),
                         user.getUserImage().clone()))
                 .collect(Collectors.toList());
@@ -244,7 +215,6 @@ public class CustomerServiceImpl implements CustomerService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
