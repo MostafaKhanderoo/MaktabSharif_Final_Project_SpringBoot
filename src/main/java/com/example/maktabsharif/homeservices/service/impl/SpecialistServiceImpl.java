@@ -1,62 +1,49 @@
 package com.example.maktabsharif.homeservices.service.impl;
 
-import com.example.maktabsharif.homeservices.dto.user.UserCreateDTO;
+import com.example.maktabsharif.homeservices.dto.user.SpecialistCreateDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserDTO;
 import com.example.maktabsharif.homeservices.dto.user.UserUpdateDTO;
 import com.example.maktabsharif.homeservices.entity.Role;
 import com.example.maktabsharif.homeservices.entity.User;
-import com.example.maktabsharif.homeservices.enumeration.RoleName;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import com.example.maktabsharif.homeservices.exception.CustomApiExceptionType;
-import com.example.maktabsharif.homeservices.exception.ExistsException;
 import com.example.maktabsharif.homeservices.exception.InvalidInputException;
-import com.example.maktabsharif.homeservices.exception.NotFoundException;
 import com.example.maktabsharif.homeservices.repository.RoleRepository;
-import com.example.maktabsharif.homeservices.repository.UserRepository;
+import com.example.maktabsharif.homeservices.service.RoleService;
 import com.example.maktabsharif.homeservices.service.SpecialistService;
+import com.example.maktabsharif.homeservices.service.UserService;
+import com.example.maktabsharif.homeservices.service.ValidityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SpecialistServiceImpl implements SpecialistService {
-    private final UserRepository specialistRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    @Override
-    public UserDTO savaSpecialist(UserCreateDTO createDTO) throws IOException {
-        if (specialistRepository.existsUserByUsernameAndRole(createDTO.username(), RoleName.SPECIALIST))
-            throw new ExistsException("specialist with username{"+createDTO.username()+"} already exists!",
-                    CustomApiExceptionType.INTERNAL_SERVER_ERROR);
+    private final UserService specialistService;
+    private final RoleService roleService;
+    private final ValidityService validityService;
 
+    @Override
+    public UserDTO savaSpecialist(SpecialistCreateDTO createDTO) throws IOException {
         User user = new User();
         user.setFirstname(createDTO.firstname());
         user.setLastname(createDTO.lastname());
-        if (createDTO.age() >=18){
-            user.setAge(createDTO.age());
-        }else
-            throw new InvalidInputException("Age must be 18 or older!"
-                    ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
-        user.setAge(createDTO.age());
         user.setUsername(createDTO.username());
-        user.setPassword(passwordEncoder.encode(createDTO.password()));
+        user.setPassword(createDTO.password());
         user.setEmail(createDTO.email());
         user.setRegisterDate(LocalDateTime.now());
-        Role role =roleRepository.findByName(RoleName.SPECIALIST)
-                .orElseThrow(()->new NotFoundException(CustomApiExceptionType.NOT_FOUND));
-        user.setRole(role);
+        Role role =roleService.findByName(Role.EXPERT);
+        user.getRole().add(role);
         user.setUserStatus(UserStatus.PENDING);
-        user.setUserImage(createDTO.profileImage().getBytes());
 
-        var saveCustomer =specialistRepository.save(user);
-        log.info("specialist with id {} saved", saveCustomer.getId());
+        var saveCustomer =specialistService.saveUser(user);
+        validityService.createValidityForUser(user);
+        log.info("Customer with id {} saved", saveCustomer.getId());
         return getDtoFromSpecialist(saveCustomer);
 
 
@@ -64,78 +51,46 @@ public class SpecialistServiceImpl implements SpecialistService {
 
     @Override
     public UserDTO updateSpecialist(UserUpdateDTO updateDTO) throws IOException {
-        if (specialistRepository.findUserByIdAndRole(updateDTO.id(), RoleName.SPECIALIST).isEmpty())
-            throw new NotFoundException("specialist with id {"
-                    + updateDTO.id() + "} not found!",
-                    CustomApiExceptionType.NOT_FOUND);
+        specialistService.findById(updateDTO.id());
 
-        User updateSpecialist = specialistRepository.findUserById(updateDTO.id()).get();
+        User user = specialistService.chooseLoginUserById(updateDTO.id());
 
-        updateSpecialist.setFirstname(updateDTO.firstname());
-        updateSpecialist.setLastname(updateDTO.lastname());
+        user.setFirstname(updateDTO.firstname());
+        user.setLastname(updateDTO.lastname());
 
         if (updateDTO.age() >=18){
-            updateSpecialist.setAge(updateDTO.age());
+            user.setAge(updateDTO.age());
         }else
-            throw new InvalidInputException("Age must be 18 or older!"
+            throw new   InvalidInputException("Age must be 18 or older!"
                     ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
-        if (specialistRepository.existsUserByUsernameAndRole(updateDTO.username(), RoleName.SPECIALIST))
-            throw new ExistsException("specialist with username {"
-                    + updateDTO.username() + "} already exists!",
-                    CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
 
-        updateSpecialist.setUsername(updateDTO.username());
-        updateSpecialist.setEmail(updateDTO.email());
-        updateSpecialist.setPassword(updateDTO.password());
-        updateSpecialist.setUserImage(updateDTO.image().getBytes());
 
-        User saveSpecialist =specialistRepository.save(updateSpecialist);
-        log.info("specialist with id {} updated", saveSpecialist.getId());
-        return getDtoFromSpecialist(saveSpecialist);
+        user.setUsername(updateDTO.username());
+        user.setEmail(updateDTO.email());
+        user.setPassword(updateDTO.password());
+        user.setUserImage(updateDTO.image().getBytes());
 
+        User savedCustomer =specialistService.updateUser(user);
+        log.info("Customer with id {} updated", savedCustomer.getId());
+        return getDtoFromSpecialist(savedCustomer);
 
     }
 
     @Override
     public UserDTO findById(Long id) {
-        Optional<User> specialist =specialistRepository.findById(id);
-
-        if(specialist.isEmpty() && !specialist.get().getRole().equals(RoleName.SPECIALIST))
-            throw new NotFoundException("specialist with id{"+
-                    id+"} not found!"
-                    ,CustomApiExceptionType.NOT_FOUND);
-
-        return getDtoFromSpecialist(specialist.get());
-
+     var specialist=   specialistService.findById(id);
+        return getDtoFromSpecialist(specialist);
     }
 
     @Override
     public User findByIdUser(Long id) {
-        Optional<User>specialist =specialistRepository.findById(id);
-        if (specialist.isEmpty())
-            throw new NotFoundException("specialist with id{"+
-                    id+"} not found!"
-                    ,CustomApiExceptionType.NOT_FOUND);
-
-
-        if (!specialist.get().getRole().equals(RoleName.SPECIALIST))
-            throw new NotFoundException("You do not have access to place an order."
-                    ,CustomApiExceptionType.BAD_REQUEST);
-
-        return specialist.get();
+     return   specialistService.findById(id);
     }
 
     @Override
     public void deleteById(Long id) {
-        if (specialistRepository.findUserByIdAndRole(id, RoleName.SPECIALIST).isEmpty())
-            throw new NotFoundException("specialist with id{"+
-                    id+"} not found!"
-                    ,CustomApiExceptionType.NOT_FOUND);
-
-
-        specialistRepository.deleteById(id);
-        log.info("specialist with id{"+id+"} deleted!");
+       specialistService.deleteById(id);
 
     }
 
@@ -154,7 +109,6 @@ public class SpecialistServiceImpl implements SpecialistService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .registerDate(user.getRegisterDate())
-                .role(user.getRole())
                 .profileImage(user.getUserImage())
                 .userStatus(user.getUserStatus())
                 .build();
