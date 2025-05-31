@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expert Dashboard | HomeHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .badge-accepted {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+        .badge-pending {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        .badge-completed {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex-shrink-0">
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-home-alt mr-2 text-blue-600"></i>
+                    HomeHub Pro
+                </h1>
+            </div>
+            <nav class="p-4">
+                <div class="mb-6">
+                    <h3 class="text-xs uppercase text-gray-500 font-semibold mb-3">Main</h3>
+                    <a href="#" class="flex items-center py-2 px-3 bg-blue-50 text-blue-600 rounded-lg">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-xs uppercase text-gray-500 font-semibold mb-3">Orders</h3>
+                    <a href="#available-orders" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-list-alt mr-3"></i>
+                        Available Orders
+                    </a>
+                    <a href="#my-orders" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <i class="fas fa-clipboard-check mr-3"></i>
+                        My Orders
+                    </a>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-xs uppercase text-gray-500 font-semibold mb-3">Account</h3>
+                    <a href="#wallet" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-wallet mr-3"></i>
+                        My Wallet
+                    </a>
+                    <a href="#withdraw" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-money-bill-wave mr-3"></i>
+                        Withdraw Funds
+                    </a>
+                    <a href="#profile" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <i class="fas fa-user-cog mr-3"></i>
+                        Profile Settings
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <button class="mr-4 text-gray-500 md:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold text-gray-800">Professional Dashboard</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                        <i class="fas fa-star mr-1"></i>
+                        4.8
+                    </div>
+                    <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        <i class="fas fa-coins mr-1"></i>
+                        $1,245.50
+                    </div>
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                    </button>
+                    <div class="flex items-center">
+                        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Profile" class="w-8 h-8 rounded-full mr-2">
+                        <span class="text-sm font-medium">Michael S.</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Welcome Card -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 text-white mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold mb-2">Welcome back, Michael!</h2>
+                            <p class="opacity-90">You have <strong>3 new orders</strong> available in your area.</p>
+                        </div>
+                        <div class="bg-white/20 p-3 rounded-lg">
+                            <i class="fas fa-tools text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                                <i class="fas fa-list-alt text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Available Orders</h3>
+                                <p class="text-2xl font-bold mt-1">12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-green-100 rounded-lg mr-4">
+                                <i class="fas fa-clipboard-check text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">My Active Orders</h3>
+                                <p class="text-2xl font-bold mt-1">5</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-purple-100 rounded-lg mr-4">
+                                <i class="fas fa-star text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">My Rating</h3>
+                                <p class="text-2xl font-bold mt-1">4.8/5</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-orange-100 rounded-lg mr-4">
+                                <i class="fas fa-wallet text-orange-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Wallet Balance</h3>
+                                <p class="text-2xl font-bold mt-1">$1,245</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Orders Section -->
+                <div id="available-orders" class="bg-white rounded-xl p-6 mb-6 border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">Available Orders Near You</h3>
+                        <div class="flex space-x-2">
+                            <button class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg">
+                                <i class="fas fa-filter mr-1"></i> Filter
+                            </button>
+                            <button class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg">
+                                <i class="fas fa-sync-alt mr-1"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-7921</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-faucet mr-2 text-blue-500"></i>
+                                            Plumbing Repair
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2.3 km away</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Today, 2:00 PM</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">$85.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs">
+                                            Accept Order
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-7918</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-broom mr-2 text-green-500"></i>
+                                            Deep Cleaning
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1.5 km away</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Tomorrow, 9:00 AM</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">$120.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs">
+                                            Accept Order
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-7912</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-snowflake mr-2 text-blue-400"></i>
+                                            AC Installation
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3.1 km away</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jun 15, 2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">$250.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs">
+                                            Accept Order
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- My Orders Section -->
+                <div id="my-orders" class="bg-white rounded-xl p-6 mb-6 border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">My Active Orders</h3>
+                        <a href="#" class="text-sm text-blue-600 hover:underline">View all orders</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-7895</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-faucet mr-2 text-blue-500"></i>
+                                            Pipe Leak Repair
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <img src="https://randomuser.me/api/portraits/women/45.jpg" class="w-6 h-6 rounded-full mr-2">
+                                            Sarah J.
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Today, 11:00 AM</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full badge-accepted">
+                                            In Progress
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-xs">
+                                            Update Status
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-7883</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-broom mr-2 text-green-500"></i>
+                                            Apartment Cleaning
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <img src="https://randomuser.me/api/portraits/men/22.jpg" class="w-6 h-6 rounded-full mr-2">
+                                            Robert K.
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Tomorrow, 10:00 AM</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full badge-pending">
+                                            Scheduled
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-xs">
+                                            Start Job
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-7867</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-tools mr-2 text-orange-500"></i>
+                                            Furniture Assembly
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <img src="https://randomuser.me/api/portraits/women/68.jpg" class="w-6 h-6 rounded-full mr-2">
+                                            Emily T.
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jun 14, 2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full badge-completed">
+                                            Waiting Payment
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <button class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg text-xs">
+                                            View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Wallet & Profile Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Wallet Card -->
+                    <div id="wallet" class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">My Wallet</h3>
+                            <a href="#withdraw" class="text-sm text-blue-600 hover:underline">Withdraw funds</a>
+                        </div>
+                        <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-600">Available Balance</p>
+                                    <h3 class="text-2xl font-bold">$1,245.50</h3>
+                                </div>
+                                <div class="p-3 bg-blue-100 rounded-lg">
+                                    <i class="fas fa-wallet text-blue-600 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-medium mb-2">Recent Transactions</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="p-2 bg-green-100 rounded-lg mr-3">
+                                            <i class="fas fa-arrow-down text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">Order #ORD-7854</p>
+                                            <p class="text-xs text-gray-500">Jun 10, 2023</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-green-600 font-medium">+$120.00</div>
+                                </div>
+                                <div class="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="p-2 bg-red-100 rounded-lg mr-3">
+                                            <i class="fas fa-arrow-up text-red-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">Withdrawal</p>
+                                            <p class="text-xs text-gray-500">Jun 5, 2023</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-red-600 font-medium">-$500.00</div>
+                                </div>
+                                <div class="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="p-2 bg-green-100 rounded-lg mr-3">
+                                            <i class="fas fa-arrow-down text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">Order #ORD-7821</p>
+                                            <p class="text-xs text-gray-500">Jun 2, 2023</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-green-600 font-medium">+$85.50</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Card -->
+                    <div id="profile" class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">My Profile</h3>
+                            <a href="#" class="text-sm text-blue-600 hover:underline">Edit profile</a>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Profile" class="w-16 h-16 rounded-full mr-4">
+                            <div>
+                                <h4 class="font-bold">Michael Smith</h4>
+                                <p class="text-sm text-gray-600">Plumbing & Cleaning Specialist</p>
+                                <div class="flex items-center mt-1">
+                                    <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
+                                    <span class="text-sm font-medium">4.8</span>
+                                    <span class="mx-2 text-gray-300">|</span>
+                                    <i class="fas fa-check-circle text-green-500 text-sm mr-1"></i>
+                                    <span class="text-sm text-gray-600">Verified Pro</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Services</p>
+                                <p class="font-medium">Plumbing, Cleaning, AC</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Experience</p>
+                                <p class="font-medium">8 years</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Completed Jobs</p>
+                                <p class="font-medium">142</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Response Time</p>
+                                <p class="font-medium">Under 1 hour</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-medium mb-2">About Me</h4>
+                            <p class="text-sm text-gray-600">
+                                Certified plumbing and cleaning professional with 8+ years of experience.
+                                I provide high-quality services with attention to detail and customer satisfaction.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Withdraw Funds Modal (hidden by default) -->
+                <div id="withdraw-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div class="bg-white rounded-lg w-full max-w-md">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Withdraw Funds</h3>
+                                <button onclick="document.getElementById('withdraw-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Amount to Withdraw</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                    <input type="number" class="pl-8 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="0.00" min="10" max="1245.50">
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Minimum withdrawal: $10.00</p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Bank Account</label>
+                                <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                                    <option>**** **** **** 1234 - Chase Bank</option>
+                                    <option>Add new bank account</option>
+                                </select>
+                            </div>
+                            <div class="flex justify-end space-x-3">
+                                <button onclick="document.getElementById('withdraw-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button class="px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium text-white hover:bg-blue-700">
+                                    Confirm Withdrawal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to handle the withdraw modal
+        document.addEventListener('DOMContentLoaded', function() {
+            // When "Withdraw funds" link is clicked
+            document.querySelectorAll('[href="#withdraw"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('withdraw-modal').classList.remove('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

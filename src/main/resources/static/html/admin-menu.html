@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | HomeHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white w-64 border-r border-gray-200 flex-shrink-0">
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-home-alt mr-2 text-blue-600"></i>
+                    HomeHub Admin
+                </h1>
+            </div>
+            <nav class="p-4">
+                <div class="mb-6">
+                    <h3 class="text-xs uppercase text-gray-500 font-semibold mb-3">Main</h3>
+                    <a href="#" class="flex items-center py-2 px-3 bg-blue-50 text-blue-600 rounded-lg">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-xs uppercase text-gray-500 font-semibold mb-3">Management</h3>
+                    <a href="/search_customer.html" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-search mr-3"></i>
+                        Search Customers
+                    </a>
+                    <a href="/search-order.html" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-clipboard-list mr-3"></i>
+                        Search Orders
+                    </a>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-xs uppercase text-gray-500 font-semibold mb-3">Services</h3>
+                    <a href="/service-category-create.html" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-layer-group mr-3"></i>
+                        Create Service Category
+                    </a>
+                    <a href="/sub-service-create.html" class="flex items-center py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <i class="fas fa-tools mr-3"></i>
+                        Create Sub Service
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <button class="mr-4 text-gray-500 md:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold text-gray-800">Admin Dashboard</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="flex items-center">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="w-8 h-8 rounded-full mr-2">
+                        <span class="text-sm font-medium">Admin User</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Welcome Card -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 text-white mb-6">
+                    <h2 class="text-xl font-bold mb-2">Welcome back, Admin!</h2>
+                    <p class="opacity-90">Manage your home service platform efficiently with these quick actions.</p>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <a href="/search_customer.html" class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                                <i class="fas fa-search text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Search Customers</h3>
+                                <p class="text-sm text-gray-500">Find customer details</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="/search-order.html" class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-green-100 rounded-lg mr-4">
+                                <i class="fas fa-clipboard-list text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Search Orders</h3>
+                                <p class="text-sm text-gray-500">View service orders</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="/service-category-create.html" class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-purple-100 rounded-lg mr-4">
+                                <i class="fas fa-layer-group text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Service Categories</h3>
+                                <p class="text-sm text-gray-500">Add new categories</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="/sub-service-create.html" class="bg-white rounded-xl p-5 card-hover border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-orange-100 rounded-lg mr-4">
+                                <i class="fas fa-tools text-orange-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Sub Services</h3>
+                                <p class="text-sm text-gray-500">Create new services</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Recent Activity Section -->
+                <div class="bg-white rounded-xl p-6 mb-6 border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">Recent Activity</h3>
+                        <a href="#" class="text-sm text-blue-600 hover:underline">View all</a>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="p-2 bg-blue-100 rounded-lg mr-4">
+                                <i class="fas fa-user-plus text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm"><span class="font-medium">5 new customers</span> registered today</p>
+                                <p class="text-xs text-gray-500">2 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="p-2 bg-green-100 rounded-lg mr-4">
+                                <i class="fas fa-clipboard-check text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm"><span class="font-medium">12 new orders</span> completed</p>
+                                <p class="text-xs text-gray-500">5 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="p-2 bg-purple-100 rounded-lg mr-4">
+                                <i class="fas fa-tools text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm">New service category <span class="font-medium">"Home Cleaning"</span> added</p>
+                                <p class="text-xs text-gray-500">Yesterday</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Customers</p>
+                                <h3 class="text-2xl font-bold mt-1">1,248</h3>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-lg">
+                                <i class="fas fa-users text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-green-500">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span>12% from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-500">Active Orders</p>
+                                <h3 class="text-2xl font-bold mt-1">84</h3>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-lg">
+                                <i class="fas fa-clipboard-list text-green-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-red-500">
+                                <i class="fas fa-arrow-down mr-1"></i>
+                                <span>5% from last week</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-500">Service Experts</p>
+                                <h3 class="text-2xl font-bold mt-1">156</h3>
+                            </div>
+                            <div class="p-3 bg-purple-100 rounded-lg">
+                                <i class="fas fa-user-cog text-purple-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-green-500">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span>8 new this month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
