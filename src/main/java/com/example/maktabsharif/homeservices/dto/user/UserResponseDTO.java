@@ -1,7 +1,6 @@
 package com.example.maktabsharif.homeservices.dto.user;
 
 import com.example.maktabsharif.homeservices.entity.User;
-import com.example.maktabsharif.homeservices.entity.Role;
 import com.example.maktabsharif.homeservices.enumeration.UserStatus;
 import lombok.Builder;
 
@@ -15,7 +14,6 @@ public record UserResponseDTO(String firstName,
                               String password,
                               String email,
                               LocalDateTime registerDate,
-                              Role role,
                               UserStatus userStatus,
                               byte[] profileImage
 ) {
@@ -29,7 +27,6 @@ public record UserResponseDTO(String firstName,
                 user.getPassword(),
                 user.getEmail(),
                 user.getRegisterDate(),
-                user.getRole(),
                 user.getUserStatus(),
                 user.getUserImage()
         );
