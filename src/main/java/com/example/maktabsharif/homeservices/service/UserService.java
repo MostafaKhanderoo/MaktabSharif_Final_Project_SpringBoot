@@ -14,14 +14,14 @@ import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
 
-    UserDTO saveUser(UserCreateDTO createDTO, RoleName roleName)throws IOException;
-    UserDTO updateUser(UserUpdateDTO updateDTO) throws IOException;
+    User  saveUser(User user)throws IOException;
+    User updateUser(User user) throws IOException;
 
-    UserDTO findByIdAndRole(Long id);
+    User findById(Long id);
 
     void deleteById(Long id);
 
-    Optional<User> chooseLoginUserById(Long id);
+    User chooseLoginUserById(Long id);
 
     User findUserByFirstName(String firstName);
 
