@@ -1,191 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>HomeHub - Sign Up</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4f0fb 100%);
-        }
-        .card {
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.15);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd1 0%, #6a4295 100%);
-        }
-        .user-type-btn {
-            transition: all 0.3s ease;
-        }
-        .user-type-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .file-input-label {
-            transition: all 0.3s ease;
-        }
-        .file-input-label:hover {
-            background-color: #f0f4ff;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>HomeHub - Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4f0fb 100%);
+    }
+    .card {
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.15);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #5a6fd1 0%, #6a4295 100%);
+    }
+    .user-type-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .error-message {
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Toast Notification Styles */
+    .toast {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+    }
+
+    .toast.success {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .toast.error {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .toast.show {
+      top: 20px;
+      opacity: 1;
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    @keyframes slideIn {
+      from {
+        top: -100px;
+        opacity: 0;
+      }
+      to {
+        top: 20px;
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        top: 20px;
+        opacity: 1;
+      }
+      to {
+        top: -100px;
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
 <div class="bg-white card rounded-2xl overflow-hidden w-full max-w-md">
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-center">
-        <h1 class="text-3xl font-bold text-white">Create Account</h1>
-        <p class="text-indigo-100 mt-2">Join HomeHub today</p>
+  <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-center">
+    <h1 class="text-3xl font-bold text-white">Create Account</h1>
+    <p class="text-indigo-100 mt-2">Join HomeHub today</p>
+  </div>
+
+  <div class="p-8">
+    <div class="flex gap-2 mb-6">
+      <button type="button" id="customerBtn" class="user-type-btn active flex-1 py-2 rounded-lg border border-indigo-200 text-indigo-600 font-medium">
+        I'm a Customer
+      </button>
+      <button type="button" id="expertBtn" class="user-type-btn flex-1 py-2 rounded-lg border border-indigo-200 text-indigo-600 font-medium">
+        I'm a Service Expert
+      </button>
     </div>
 
-    <div class="p-8">
-        <div class="flex gap-2 mb-6">
-            <button id="customerBtn" class="user-type-btn active flex-1 py-2 rounded-lg border border-indigo-200 text-indigo-600 font-medium">
-                I'm a Customer
-            </button>
-            <button id="expertBtn" class="user-type-btn flex-1 py-2 rounded-lg border border-indigo-200 text-indigo-600 font-medium">
-                I'm a Service Expert
-            </button>
+    <form id="signupForm" enctype="multipart/form-data">
+      <input type="hidden" id="userType" name="userType" value="customer" />
+
+      <div class="space-y-4">
+        <div>
+          <label for="firstname" class="block text-sm font-medium text-gray-700 mb-1">Firstname</label>
+          <input type="text" id="firstname" name="firstname" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
         </div>
 
-        <form id="signupForm">
-            <div class="space-y-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input type="text" id="name" name="name" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                </div>
-
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                    <input type="email" id="email" name="email" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                </div>
-
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="password" name="password" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                </div>
-
-                <div>
-                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                </div>
-
-                <!-- Expert-specific fields (hidden by default) -->
-                <div id="expertFields" class="hidden space-y-4">
-                    <div>
-                        <label for="service" class="block text-sm font-medium text-gray-700 mb-1">Service Type</label>
-                        <select id="service" name="service" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                            <option value="">Select your service</option>
-                            <option value="plumbing">Plumbing</option>
-                            <option value="electrical">Electrical</option>
-                            <option value="cleaning">Cleaning</option>
-                            <option value="painting">Painting</option>
-                            <option value="carpentry">Carpentry</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                        <input type="number" id="experience" name="experience" min="0" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                    </div>
-
-                    <div>
-                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                        <textarea id="bio" name="bio" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
-                        <label for="photo" class="file-input-label flex flex-col items-center justify-center w-full px-4 py-6 rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:border-indigo-500 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span class="text-indigo-600 font-medium">Click to upload photo</span>
-                            <span class="text-xs text-gray-500 mt-1">PNG, JPG up to 2MB</span>
-                            <input id="photo" name="photo" type="file" accept="image/*" class="hidden">
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6">
-                <button type="submit" class="btn-primary w-full text-white py-3 rounded-lg font-medium transition flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    Create Account
-                </button>
-            </div>
-        </form>
-
-        <div class="mt-6 text-center text-sm text-gray-500">
-            <p>Already have an account? <a href="/html/index.html" class="text-indigo-600 hover:underline">Sign in</a></p>
+        <div>
+          <label for="lastname" class="block text-sm font-medium text-gray-700 mb-1">Lastname</label>
+          <input type="text" id="lastname" name="lastname" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
         </div>
+
+        <div>
+          <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+          <input type="number" id="age" name="age" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="email" name="email" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input type="text" id="username" name="username" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="password" name="password" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-indigo-500" />
+        </div>
+
+        <!-- Expert-specific fields -->
+        <div id="expertFields" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
+          <label for="profileImage" class="flex flex-col items-center justify-center px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-indigo-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span class="text-indigo-600 font-medium">Click to upload photo</span>
+            <span class="text-xs text-gray-500 mt-1">PNG, JPG up to 2MB</span>
+            <input id="profileImage" name="profileImage" type="file" accept="image/*" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <button type="submit" class="btn-primary w-full text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Create Account
+        </button>
+      </div>
+    </form>
+
+    <div class="mt-6 text-center text-sm text-gray-500">
+      <p>Already have an account? <a href="/html/login.html" class="text-indigo-600 hover:underline">Sign in</a></p>
     </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+  <svg id="toast-icon" class="toast-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+  </svg>
+  <span id="toast-message">Message</span>
 </div>
 
 <script>
-    const customerBtn = document.getElementById('customerBtn');
-    const expertBtn = document.getElementById('expertBtn');
-    const expertFields = document.getElementById('expertFields');
+  // User type selection
+  const customerBtn = document.getElementById('customerBtn');
+  const expertBtn = document.getElementById('expertBtn');
+  const expertFields = document.getElementById('expertFields');
+  const userTypeInput = document.getElementById('userType');
 
-    customerBtn.addEventListener('click', function() {
-        this.classList.add('active', 'text-white');
-        expertBtn.classList.remove('active', 'text-white');
-        expertFields.classList.add('hidden');
-    });
+  customerBtn.addEventListener('click', () => {
+    customerBtn.classList.add('active');
+    expertBtn.classList.remove('active');
+    expertFields.classList.add('hidden');
+    userTypeInput.value = 'customer';
+  });
 
-    expertBtn.addEventListener('click', function() {
-        this.classList.add('active', 'text-white');
-        customerBtn.classList.remove('active', 'text-white');
-        expertFields.classList.remove('hidden');
-    });
+  expertBtn.addEventListener('click', () => {
+    expertBtn.classList.add('active');
+    customerBtn.classList.remove('active');
+    expertFields.classList.remove('hidden');
+    userTypeInput.value = 'specialist';
+  });
 
-    document.getElementById('signupForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+  // Toast notification functions
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastIcon = document.getElementById('toast-icon');
+    const toastMessage = document.getElementById('toast-message');
 
-        // Form validation
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+    // Set message and style based on type
+    toastMessage.textContent = message;
+    toast.className = 'toast ' + type;
 
-        if (password !== confirmPassword) {
-            alert('Passwords do not match!');
-            return;
-        }
+    // Change icon based on type
+    if (type === 'success') {
+      toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>';
+    } else {
+      toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>';
+    }
 
-        // Here you would typically send the form data to your server
-        alert('Account created successfully!');
-        // window.location.href = '/html/index.html'; // Redirect to login page
-    });
+    // Show toast with animation
+    toast.classList.add('show');
 
-    // Show selected file name
-    document.getElementById('photo').addEventListener('change', function(e) {
-        const label = document.querySelector('.file-input-label');
-        if (this.files.length > 0) {
-            label.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="text-green-600 font-medium">${this.files[0].name}</span>
-                <span class="text-xs text-gray-500 mt-1">Click to change</span>
-            `;
-        }
-    });
+    // Hide after 5 seconds
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 5000);
+  }
+
+  // Form submission
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Validate password match
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (password !== confirmPassword) {
+      showToast('Passwords do not match!', 'error');
+      return;
+    }
+
+    const form = e.target;
+    const userType = document.getElementById('userType').value;
+    let url = userType === 'specialist' ? '/api/specialist/create' : '/api/customer/create';
+
+    try {
+      let options = { method: 'POST' };
+
+      if (userType === 'specialist') {
+        const formData = new FormData(form);
+        options.body = formData;
+      } else {
+        const formData = new FormData(form);
+        const plainObj = Object.fromEntries(formData.entries());
+        delete plainObj.profileImage;
+        options.headers = { 'Content-Type': 'application/json' };
+        options.body = JSON.stringify(plainObj);
+      }
+
+      const res = await fetch(url, options);
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Registration failed. Please try again.');
+      }
+
+      // Show success message
+      showToast('Account created successfully! Redirecting to login...', 'success');
+
+      // Redirect to login page after 2 seconds
+      setTimeout(() => {
+        window.location.href = '/html/login.html';
+      }, 2000);
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  });
 </script>
 
 </body>
