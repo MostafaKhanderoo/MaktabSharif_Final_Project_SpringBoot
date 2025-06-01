@@ -35,6 +35,12 @@ public class SpecialistServiceImpl implements SpecialistService {
         user.setLastname(createDTO.lastname());
         user.setUsername(createDTO.username());
         user.setPassword(createDTO.password());
+        if (createDTO.age() >=18){
+            user.setAge(createDTO.age());
+        }else
+            throw new   InvalidInputException("Age must be 18 or older!"
+                    ,CustomApiExceptionType.UNPROCESSIBLE_ENTITY);
+
         user.setEmail(createDTO.email());
         user.setRegisterDate(LocalDateTime.now());
         Role role =roleService.findByName(Role.EXPERT);
@@ -43,7 +49,7 @@ public class SpecialistServiceImpl implements SpecialistService {
 
         var saveCustomer =specialistService.saveUser(user);
         validityService.createValidityForUser(user);
-        log.info("Customer with id {} saved", saveCustomer.getId());
+        log.info("Specialist with id {} saved", saveCustomer.getId());
         return getDtoFromSpecialist(saveCustomer);
 
 
